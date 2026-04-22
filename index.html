@@ -8,49 +8,80 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 1. BACKGROUND MODERN GRADIENT */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;600&display=swap');
+
+        /* 1. BACKGROUND DINAMIS */
         body { 
             font-family: 'Poppins', sans-serif; 
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            background-attachment: fixed;
             margin: 0; 
             color: white;
             display: flex;
             justify-content: center;
             min-height: 100vh;
+            transition: all 0.5s ease-in-out;
+            padding-bottom: 50px; /* Ruang untuk footer */
         }
 
-        /* 2. CONTAINER HALAMAN (GLASSMORPHISM) */
+        /* Background Halaman Utama (Gambar 3D) */
+        body.bg-home {
+            background: linear-gradient(rgba(10, 15, 30, 0.7), rgba(10, 15, 30, 0.9)), url('bg.jpg') center/cover no-repeat fixed;
+        }
+
+        /* Background Halaman Dalam (Cyber Tech) */
+        body.bg-canggih {
+            background-color: #0b0f19;
+            background-image: 
+                radial-gradient(circle at 50% 0%, #1a365d 0%, transparent 50%),
+                linear-gradient(rgba(0, 210, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 210, 255, 0.05) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+            background-attachment: fixed;
+        }
+
+        /* 2. KOTAK KONTEN (GLASSMORPHISM) */
         .page { 
             display: none; 
             padding: 30px 20px; 
             width: 90%;
             max-width: 500px;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
+            background: rgba(16, 25, 45, 0.6);
+            backdrop-filter: blur(12px);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            border: 1px solid rgba(0, 210, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
             margin: 20px 0;
             animation: fadeIn 0.5s ease;
+            position: relative;
+            z-index: 10;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .active { display: block; }
 
-        /* 3. TOMBOL KEREN */
+        /* 3. TYPOGRAPHY */
+        h1 { 
+            font-family: 'Orbitron', sans-serif; 
+            font-size: 28px; 
+            color: #00d2ff;
+            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
+            margin-bottom: 5px; 
+        }
+        h3 { font-family: 'Orbitron', sans-serif; color: #00d2ff; text-align: center; border-bottom: 1px solid rgba(0,210,255,0.3); padding-bottom: 10px;}
+        p { opacity: 0.8; font-weight: 300; font-size: 14px; }
+
+        /* 4. TOMBOL KEREN */
         .btn { 
-            background: rgba(255, 255, 255, 0.2);
-            color: white; 
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            background: rgba(0, 0, 0, 0.4);
+            color: #fff; 
+            border: 1px solid rgba(0, 210, 255, 0.4);
             padding: 15px 20px; 
-            margin: 12px 0; 
-            border-radius: 15px; 
-            font-size: 16px; 
+            margin: 10px 0; 
+            border-radius: 12px; 
+            font-size: 15px; 
             font-weight: 600;
             cursor: pointer; 
             width: 100%;
@@ -58,59 +89,95 @@
             text-align: left;
             display: flex;
             align-items: center;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
         .btn:hover {
-            background: white;
-            color: #1e3c72;
-            transform: scale(1.03);
+            background: rgba(0, 210, 255, 0.1);
+            border-color: #00d2ff;
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
+            transform: translateX(5px);
         }
 
-        .btn-danger { background: rgba(220, 53, 69, 0.6); border: none; text-align: center; justify-content: center;}
-        .btn-danger:hover { background: #dc3545; color: white; }
+        .number-icon { background: rgba(0,210,255,0.2); color: #00d2ff; padding: 5px 12px; border-radius: 8px; margin-right: 15px; font-weight: bold; }
 
-        /* 4. TATA LETAK GRAFIK */
+        /* TOMBOL FITUR AI */
+        .btn-ai {
+            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
+            border: none;
+            color: #fff;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+        }
+        .btn-ai:hover {
+            background: linear-gradient(45deg, #3a7bd5, #00d2ff);
+            box-shadow: 0 0 25px rgba(0, 210, 255, 0.8);
+            transform: scale(1.02);
+        }
+        .btn-ai .number-icon { background: rgba(0,0,0,0.3); color: white; }
+
+        .btn-danger { background: rgba(220, 53, 69, 0.8); border: 1px solid #ff4d4d; text-align: center; justify-content: center; margin-top: 20px;}
+        .btn-danger:hover { background: #ff4d4d; color: white; transform: scale(1.02); box-shadow: 0 0 15px rgba(220, 53, 69, 0.6); }
+
+        /* 5. TATA LETAK GRAFIK */
         .grid-grafik { 
             display: grid; 
             grid-template-columns: 1fr; 
             gap: 15px; 
             margin-top: 20px;
         }
-        
         canvas { 
-            background: rgba(255, 255, 255, 0.9); 
+            background: rgba(0, 0, 0, 0.5); 
+            border: 1px solid rgba(0,210,255,0.2);
             border-radius: 12px; 
             padding: 10px;
         }
 
-        h1 { font-size: 28px; margin-bottom: 5px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        p { opacity: 0.8; font-weight: 300; }
-        .number-icon { background: rgba(255,255,255,0.2); padding: 5px 12px; border-radius: 10px; margin-right: 15px; }
+        /* 6. FOOTER DAZA STORE */
+        .footer {
+            position: fixed;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 2px;
+            font-family: 'Orbitron', sans-serif;
+            z-index: 1;
+        }
+        .footer span { color: #00d2ff; font-weight: bold; text-shadow: 0 0 5px rgba(0,210,255,0.8); }
     </style>
 </head>
-<body>
+<body class="bg-home">
 
     <div id="welcome" class="page active">
-        <div style="font-size: 60px;">🌡️</div>
-        <h1>Smart Dehidrator</h1>
-        <p>Advanced IoT Control System</p>
-        <br>
-        <button class="btn btn-danger" style="margin: auto;" onclick="pindah('menu')">MULAI SEKARANG</button>
+        <div style="text-align: center;">
+            <div style="font-size: 60px; text-shadow: 0 0 20px #00d2ff;">💠</div>
+            <h1>Smart Dehidrator</h1>
+            <p>Sistem Kontrol & Monitoring IoT V.1</p>
+            <br><br>
+            <button class="btn btn-ai" style="justify-content: center;" onclick="pindah('menu')">INISIALISASI SISTEM 🚀</button>
+        </div>
     </div>
 
     <div id="menu" class="page">
-        <h3>Menu Panel</h3>
-        <button class="btn" onclick="alert('Daging')"><span class="number-icon">1</span> Pengeringan Daging</button>
-        <button class="btn" onclick="alert('Buah')"><span class="number-icon">2</span> Pengeringan Buah</button>
-        <button class="btn" onclick="alert('Sayur')"><span class="number-icon">3</span> Pengeringan Sayur</button>
-        <button class="btn" onclick="alert('Panduan')"><span class="number-icon">4</span> Buku Panduan</button>
-        <button class="btn" onclick="pindah('grafik')"><span class="number-icon">5</span> Realtime Monitoring</button>
-        <br>
-        <button class="btn btn-danger" onclick="pindah('welcome')">MATIKAN SISTEM</button>
+        <h3>Pusat Kendali</h3>
+        
+        <button class="btn btn-ai" onclick="alert('⚡ Mengaktifkan AI Auto-Dry... Sensor mendeteksi kelembaban bahan dan menyesuaikan suhu secara real-time!')">
+            <span class="number-icon">★</span> Mode AI Auto-Dry
+        </button>
+
+        <button class="btn" onclick="alert('Memuat parameter Daging...')"><span class="number-icon">1</span> Pengeringan Daging</button>
+        <button class="btn" onclick="alert('Memuat parameter Buah...')"><span class="number-icon">2</span> Pengeringan Buah</button>
+        <button class="btn" onclick="alert('Memuat parameter Sayur...')"><span class="number-icon">3</span> Pengeringan Sayur</button>
+        <button class="btn" onclick="pindah('grafik')"><span class="number-icon">4</span> Realtime Monitoring</button>
+        
+        <button class="btn btn-danger" onclick="pindah('welcome')">MATIKAN MESIN</button>
     </div>
 
-    <div id="grafik" class="page" style="max-width: 800px;">
-        <h3>Live Sensor Data</h3>
+    <div id="grafik" class="page" style="max-width: 800px; width: 95%;">
+        <h3>Data Sensor Realtime</h3>
+        <p style="text-align: center; color: #00d2ff;">Status Koneksi: Terhubung ke Database Server</p>
         <div class="grid-grafik">
             <canvas id="chart1"></canvas>
             <canvas id="chart2"></canvas>
@@ -121,53 +188,72 @@
             <canvas id="chart7"></canvas>
             <canvas id="chart8"></canvas>
         </div>
-        <button class="btn btn-danger" onclick="pindah('menu')" style="margin-top: 20px;">KEMBALI KE MENU</button>
+        <button class="btn btn-danger" onclick="pindah('menu')">KEMBALI KE KENDALI</button>
     </div>
 
+    <div class="footer">DIBUAT OLEH <span>DAZA STORE</span></div>
+
     <script>
-        // CONFIG FIREBASE (PASTIKAN ISI DENGAN BENAR NU!)
+        // CONFIG FIREBASE (URL SUDAH DIPERBAIKI DENGAN HTTPS)
         const firebaseConfig = {
             apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
-            databaseURL: "smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
+            databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
+        // Logika Pindah Halaman & Ganti Background
         function pindah(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
+
+            // Ganti tema background sesuai halaman
+            if(id === 'welcome') {
+                document.body.className = 'bg-home';
+            } else {
+                document.body.className = 'bg-canggih';
+            }
         }
 
+        // Konfigurasi Tampilan Grafik (Dark Mode)
+        Chart.defaults.color = '#fff';
+        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
+        
         const ctxs = [1,2,3,4,5,6,7,8].map(i => document.getElementById(`chart${i}`).getContext('2d'));
         const charts = ctxs.map((ctx, i) => new Chart(ctx, {
             type: 'line',
             data: { labels: [], datasets: [{ 
-                label: i==7 ? 'Thermo (°C)' : `DS18B20-${i+1} (°C)`, 
+                label: i==7 ? 'Suhu Utama (°C)' : `Rak ${i} (°C)`, 
                 data: [], 
-                borderColor: '#1e3c72',
-                backgroundColor: 'rgba(30, 60, 114, 0.1)',
+                borderColor: '#00d2ff',
+                backgroundColor: 'rgba(0, 210, 255, 0.2)',
+                borderWidth: 2,
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: '#fff',
+                pointRadius: 3
             }] },
             options: { 
                 scales: { y: { beginAtZero: false } },
-                plugins: { legend: { display: true } }
+                plugins: { legend: { display: true } },
+                animation: { duration: 500 }
             }
         }));
 
+        // Ambil Data Firebase Realtime
         db.ref('monitoring').on('value', (snapshot) => {
             const data = snapshot.val();
             if(data) {
                 for(let i=1; i<=8; i++) {
                     const val = data[`rak${i}`];
-                    updateChart(charts[i-1], val);
+                    if(val !== undefined) updateChart(charts[i-1], val);
                 }
             }
         });
 
         function updateChart(chart, value) {
-            const now = new Date().toLocaleTimeString();
+            const now = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
             if(chart.data.labels.length > 7) {
                 chart.data.labels.shift();
                 chart.data.datasets[0].data.shift();
