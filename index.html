@@ -2,319 +2,259 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Smart Dehidrator OS V.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Dehidrator Pro</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=SF+Pro+Display:wght@300;400;600&display=swap');
 
         :root {
-            --neon-blue: #00f3ff;
-            --neon-blue-dim: rgba(0, 243, 255, 0.2);
-            --dark-bg: #070b14;
-            --panel-bg: rgba(12, 18, 34, 0.85);
-            --danger: #ff3333;
+            --primary: #00e5ff;
+            --primary-glow: rgba(0, 229, 255, 0.4);
+            --bg-dark: #050507;
+            --glass-bg: rgba(20, 25, 35, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --danger: #ff2a55;
+            --danger-glow: rgba(255, 42, 85, 0.4);
         }
 
-        /* 1. GLOBAL STYLES (DIOPTIMALKAN UNTUK HP) */
+        /* 1. RESET & FULL SCREEN SETUP */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'SF Pro Display', 'Segoe UI', sans-serif; 
             margin: 0; 
+            padding: 0;
             color: white;
-            background-color: var(--dark-bg);
-            transition: background 0.5s ease;
-            -webkit-tap-highlight-color: transparent; /* Hilangkan blok biru saat dipencet di HP */
+            background-color: var(--bg-dark);
+            min-height: 100dvh; /* dvh membuat layar HP benar-benar full edge-to-edge */
+            overflow-x: hidden;
         }
 
-        body.bg-home {
-            background: linear-gradient(rgba(7, 11, 20, 0.7), rgba(7, 11, 20, 0.95)), url('bg.jpg') center/cover no-repeat fixed;
-        }
-
-        body.bg-canggih {
-            background-image: 
-                radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 70%),
-                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+        /* Background Dinamis */
+        #app-container {
+            min-height: 100dvh;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
             background-attachment: fixed;
+            transition: background 0.8s ease-in-out;
         }
+        
+        .bg-home { background: linear-gradient(to bottom, rgba(5,5,7,0.4) 0%, rgba(5,5,7,0.95) 100%), url('bg.jpg'); }
+        .bg-canggih { background: radial-gradient(circle at 50% -20%, #101c2e 0%, var(--bg-dark) 80%); }
+        .bg-standby { background: #000; }
 
-        /* Mode Standby / Layar Mati */
-        body.bg-standby {
-            background: radial-gradient(circle at center, #161e2e 0%, #050505 100%);
-        }
-
-        /* 2. CONTAINER & PANELS */
+        /* 2. PAGE ROUTING (MENCEGAH BUG SCROLL) */
         .page { 
             display: none; 
             width: 100%;
-            min-height: 100vh;
-            padding: 20px 15px 70px 15px; /* Ruang bawah untuk watermark */
-            box-sizing: border-box;
-            animation: bootUp 0.5s ease-out forwards;
+            min-height: 100dvh;
+            padding: 20px;
+            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         
-        /* Flex center khusus untuk halaman welcome dan mati */
-        #welcome, #layar-mati {
-            display: none;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
+        /* Flex Center khusus untuk Welcome & Standby */
+        #welcome, #layar-mati { justify-content: center; align-items: center; flex-direction: column; }
         
         .page.active { display: block; }
         #welcome.active, #layar-mati.active { display: flex; }
 
-        @keyframes bootUp {
-            0% { opacity: 0; transform: translateY(15px); }
-            100% { opacity: 1; transform: translateY(0); }
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.98); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .panel-glass {
-            background: var(--panel-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-top: 2px solid var(--neon-blue);
-            border-radius: 16px;
-            padding: 25px 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 15px rgba(0, 243, 255, 0.03);
+        /* 3. PREMIUM GLASSMORPHISM CARD */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 35px 25px;
             width: 100%;
-            max-width: 400px; /* Ukuran pas untuk HP */
+            max-width: 500px;
             margin: 0 auto;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
         }
 
-        /* 3. TYPOGRAPHY */
-        h1, h2, h3 { 
-            font-family: 'Rajdhani', sans-serif; 
-            text-transform: uppercase;
-            margin: 0 0 5px 0;
-        }
-        h1 { font-size: 28px; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue-dim); letter-spacing: 1px;}
-        .subtitle { font-size: 11px; color: #8892b0; letter-spacing: 2px; font-weight: 600; margin-bottom: 25px;}
+        /* 4. TYPOGRAPHY KELAS ATAS */
+        h1, h2 { font-family: 'Orbitron', sans-serif; margin: 0; }
+        h1 { font-size: 32px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        h2 { font-size: 20px; color: #fff; letter-spacing: 1px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;}
+        .subtitle { font-size: 13px; color: #8e9bb0; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px; margin-bottom: 30px;}
 
-        /* Status Header */
-        .status-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 10px;
-            font-family: 'Rajdhani', sans-serif;
-            letter-spacing: 1px;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            color: #a0aec0;
+        /* Status Header Mewah */
+        .status-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0,0,0,0.4); border-radius: 14px; padding: 12px 18px;
+            margin-bottom: 25px; border: 1px solid var(--glass-border);
         }
-        .live-dot {
-            height: 6px; width: 6px;
-            background-color: #00ff00;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 6px;
-            box-shadow: 0 0 5px #00ff00;
-            animation: blink 1.5s infinite;
-        }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+        .status-text { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #8e9bb0; letter-spacing: 2px; }
+        .live-indicator { display: flex; align-items: center; font-size: 10px; font-weight: bold; color: #00ff66; letter-spacing: 1px;}
+        .pulse-dot { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px #00ff66; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); } }
 
-        /* 4. BUTTONS / MENU ITEMS */
-        .btn-menu {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 3px solid #4a5568;
-            color: #e2e8f0;
+        /* 5. APP BUTTONS (NATIVE FEEL) */
+        .btn-app {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            color: #fff;
             width: 100%;
-            padding: 16px 15px; /* Lebih nyaman di tap */
-            margin-bottom: 12px;
-            border-radius: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: 13px;
+            padding: 18px 20px;
+            margin-bottom: 15px;
+            font-size: 15px;
             font-weight: 600;
             display: flex;
             align-items: center;
             cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .btn-menu:active { transform: scale(0.98); } /* Efek pencet HP */
-        
-        .btn-menu .icon { margin-right: 12px; font-size: 16px; width: 20px; text-align: center;}
-
-        .btn-primary { border-left: 3px solid var(--neon-blue); background: linear-gradient(90deg, rgba(0, 243, 255, 0.05), transparent); }
-        .btn-danger { border-left: 3px solid var(--danger); margin-top: 10px;}
-
-        /* 5. CHARTS GRID (KHUSUS HP) */
-        .grid-grafik { 
-            display: grid; 
-            grid-template-columns: 1fr; /* 1 Kolom ke bawah buat HP */
-            gap: 15px; 
-            margin-top: 15px;
-        }
-        .chart-container {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255,255,255,0.05);
-            border-radius: 10px;
-            padding: 10px;
-            height: 180px; /* Tinggi Fix biar proporsional di HP */
+            transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
+            overflow: hidden;
+        }
+        .btn-app:active { transform: scale(0.96); background: rgba(255,255,255,0.08); } /* Haptic feedback feel */
+        
+        .btn-icon { 
+            background: rgba(255,255,255,0.05); width: 40px; height: 40px; 
+            border-radius: 12px; display: flex; justify-content: center; align-items: center; 
+            margin-right: 15px; font-size: 18px; border: 1px solid var(--glass-border);
         }
 
-        /* 6. LAYAR STANDBY / MATI */
-        .standby-icon {
-            font-size: 50px;
-            color: #2d3748;
-            margin-bottom: 15px;
-            text-shadow: 0 0 15px rgba(0,0,0,0.5);
+        .btn-primary { 
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15) 0%, rgba(0, 102, 255, 0.15) 100%); 
+            border: 1px solid var(--primary-glow); 
+            justify-content: center;
         }
-        .standby-text {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 20px;
-            color: #4a5568;
-            letter-spacing: 3px;
+        .btn-primary:active { background: var(--primary); color: #000; box-shadow: 0 0 20px var(--primary-glow); }
+        .btn-primary .btn-icon { background: transparent; border: none; }
+
+        .btn-power { border-color: var(--danger-glow); color: var(--danger); margin-top: 30px;}
+        .btn-power .btn-icon { color: var(--danger); }
+        .btn-power:active { background: var(--danger); color: #fff; box-shadow: 0 0 20px var(--danger-glow); }
+
+        /* 6. CHARTS GRID ELEGANT */
+        .chart-grid { 
+            display: flex; flex-direction: column; gap: 18px; margin-top: 20px;
+            padding-bottom: 80px; /* Ruang scroll mentok */
         }
-        .btn-reboot {
-            margin-top: 40px;
-            background: transparent;
-            border: 1px solid #4a5568;
-            color: #718096;
-            padding: 8px 20px;
+        .chart-box {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--glass-border);
             border-radius: 20px;
-            font-family: 'Inter';
-            font-size: 11px;
-            letter-spacing: 1px;
-            cursor: pointer;
+            padding: 15px;
+            height: 220px; /* Ukuran pas di HP */
+            position: relative;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        /* 7. WATERMARK */
-        .watermark { 
-            position: fixed; 
-            bottom: 15px; 
-            width: 100%;
-            text-align: center;
-            font-family: 'Rajdhani', sans-serif; 
-            font-size: 10px; 
-            color: rgba(255,255,255,0.3); 
-            letter-spacing: 2px;
-            z-index: 10;
+        /* 7. STANDBY SCREEN */
+        .power-btn-huge {
+            width: 100px; height: 100px; border-radius: 50%;
+            background: transparent; border: 2px solid #333;
+            color: #333; font-size: 40px; display: flex; justify-content: center; align-items: center;
+            cursor: pointer; transition: 0.3s;
+            margin-bottom: 20px;
         }
-        .watermark span { color: rgba(0, 243, 255, 0.5); font-weight: bold;}
+        .power-btn-huge:active { border-color: #fff; color: #fff; box-shadow: 0 0 30px rgba(255,255,255,0.2); }
+        .standby-text { font-family: 'Orbitron'; color: #444; letter-spacing: 5px; font-size: 14px;}
+
+        /* Watermark Modern */
+        .watermark { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #555; letter-spacing: 2px; z-index: 10; pointer-events: none;}
+        .watermark span { color: var(--primary); font-weight: bold; }
     </style>
 </head>
-<body class="bg-home">
+<body>
+
+<div id="app-container" class="bg-home">
 
     <div id="welcome" class="page active">
-        <div class="panel-glass" style="text-align: center;">
-            <div style="font-size: 45px; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--neon-blue));">⬢</div>
-            <h1>SYSTEM ONLINE</h1>
-            <div class="subtitle">SMART DEHYDRATOR V2.0</div>
+        <div class="glass-card" style="text-align: center; background: rgba(10, 15, 25, 0.4); border: none; box-shadow: none;">
+            <div style="font-size: 60px; filter: drop-shadow(0 0 20px var(--primary)); margin-bottom: 10px;">💠</div>
+            <h1>D-HYDRATE</h1>
+            <div class="subtitle">PRO EDITION V2.5</div>
             
-            <button class="btn-menu btn-primary" style="justify-content: center; margin-top: 20px;" onclick="pindah('menu')">
-                MASUK KE SISTEM
+            <button class="btn-app btn-primary" style="margin-top: 40px;" onclick="pindah('menu')">
+                <span style="letter-spacing: 1px; font-weight: bold;">INITIALIZE SYSTEM</span>
             </button>
         </div>
     </div>
 
     <div id="menu" class="page">
-        <div class="panel-glass">
-            <div class="status-bar">
-                <span>ID: SMT-DHD-01</span>
-                <span><span class="live-dot"></span> CONNECTED</span>
+        <div class="glass-card">
+            <div class="status-header">
+                <div class="status-text">TERMINAL: ONLINE</div>
+                <div class="live-indicator"><div class="pulse-dot"></div> SYNCED</div>
             </div>
             
-            <h2 style="font-size: 18px; margin-bottom: 15px; color: #fff;">PANEL KONTROL</h2>
+            <h2>CONTROL PANEL</h2>
             
-            <button class="btn-menu" onclick="alert('Membuka Panduan Penggunaan Sistem...')">
-                <span class="icon">📖</span> Buku Pengetahuan
+            <button class="btn-app" onclick="alert('Membuka Panduan Penggunaan Sistem...')">
+                <div class="btn-icon">📖</div>
+                <span>Buku Pengetahuan</span>
             </button>
-            <button class="btn-menu" onclick="alert('Parameter Pengeringan Daging Dimuat. Memanaskan Heater...')">
-                <span class="icon">🥩</span> Pengeringan Daging
+            <button class="btn-app" onclick="alert('Parameter Daging (Jerky) Dimuat. Menyesuaikan suhu ke 70°C...')">
+                <div class="btn-icon">🥩</div>
+                <span>Pengeringan Daging</span>
             </button>
-            <button class="btn-menu" onclick="alert('Parameter Pengeringan Buah Dimuat. Menyesuaikan Suhu...')">
-                <span class="icon">🍎</span> Pengeringan Buah
+            <button class="btn-app" onclick="alert('Parameter Buah Dimuat. Menyesuaikan suhu ke 55°C...')">
+                <div class="btn-icon">🍎</div>
+                <span>Pengeringan Buah</span>
             </button>
-            <button class="btn-menu" onclick="alert('Parameter Pengeringan Sayur Dimuat. Mengatur Kipas...')">
-                <span class="icon">🥬</span> Pengeringan Sayur
-            </button>
-            <button class="btn-menu btn-primary" onclick="pindah('grafik')">
-                <span class="icon">📊</span> Realtime Monitoring
+            <button class="btn-app" onclick="alert('Parameter Sayur Dimuat. Menyesuaikan sirkulasi udara...')">
+                <div class="btn-icon">🥬</div>
+                <span>Pengeringan Sayur</span>
             </button>
             
-            <button class="btn-menu btn-danger" onclick="matikanSistem()">
-                <span class="icon" style="color: var(--danger);">⏻</span> SHUT DOWN SYSTEM
+            <button class="btn-app btn-primary" style="margin-top: 25px;" onclick="pindah('grafik')">
+                <div class="btn-icon">📈</div>
+                <span>REALTIME MONITORING</span>
+            </button>
+            
+            <button class="btn-app btn-power" onclick="matikanSistem()">
+                <div class="btn-icon">⏻</div>
+                <span>SHUT DOWN</span>
             </button>
         </div>
     </div>
 
     <div id="grafik" class="page">
-        <div class="panel-glass">
-            <div class="status-bar">
-                <span>LIVE SENSOR DATA</span>
-                <span><span class="live-dot"></span> SYNCING...</span>
+        <div class="glass-card" style="padding: 20px; background: rgba(10,15,25,0.85);">
+            <div class="status-header" style="margin-bottom: 15px;">
+                <div class="status-text">SENSOR DATA</div>
+                <div class="live-indicator"><div class="pulse-dot"></div> LIVE</div>
             </div>
             
-            <div class="grid-grafik">
-                <div class="chart-container"><canvas id="chart1"></canvas></div>
-                <div class="chart-container"><canvas id="chart2"></canvas></div>
-                <div class="chart-container"><canvas id="chart3"></canvas></div>
-                <div class="chart-container"><canvas id="chart4"></canvas></div>
-                <div class="chart-container"><canvas id="chart5"></canvas></div>
-                <div class="chart-container"><canvas id="chart6"></canvas></div>
-                <div class="chart-container"><canvas id="chart7"></canvas></div>
-                <div class="chart-container"><canvas id="chart8"></canvas></div>
-            </div>
-            
-            <button class="btn-menu" style="justify-content: center; margin-top: 20px;" onclick="pindah('menu')">
-                KEMBALI KE MENU
+            <button class="btn-app" style="justify-content: center; margin-bottom: 0; padding: 12px; font-size: 13px;" onclick="pindah('menu')">
+                ⬅ KEMBALI KE PANEL
             </button>
+
+            <div class="chart-grid">
+                <div class="chart-box"><canvas id="chart1"></canvas></div>
+                <div class="chart-box"><canvas id="chart2"></canvas></div>
+                <div class="chart-box"><canvas id="chart3"></canvas></div>
+                <div class="chart-box"><canvas id="chart4"></canvas></div>
+                <div class="chart-box"><canvas id="chart5"></canvas></div>
+                <div class="chart-box"><canvas id="chart6"></canvas></div>
+                <div class="chart-box"><canvas id="chart7"></canvas></div>
+                <div class="chart-box"><canvas id="chart8"></canvas></div>
+            </div>
         </div>
     </div>
 
     <div id="layar-mati" class="page">
-        <div class="standby-icon">⏻</div>
-        <div class="standby-text">SYSTEM STANDBY</div>
-        
-        <button class="btn-reboot" onclick="nyalakanSistem()">REBOOT SYSTEM</button>
+        <div class="power-btn-huge" onclick="nyalakanSistem()">⏻</div>
+        <div class="standby-text">SYSTEM OFFLINE</div>
+        <div style="font-size: 10px; color: #333; margin-top: 10px; font-family: sans-serif;">TAP TO WAKE</div>
     </div>
 
-    <div class="watermark" id="watermark">POWERED BY <span>DAZA STORE</span></div>
+</div>
 
-    <script>
-        // INISIALISASI FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
-            databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
+<div class="watermark" id="watermark">POWERED BY <span>DAZA STORE</span></div>
 
-        // FUNGSI PINDAH HALAMAN
-        function pindah(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
-            window.scrollTo(0,0);
-
-            if(id === 'welcome') document.body.className = 'bg-home';
-            else document.body.className = 'bg-canggih';
-            
-            document.getElementById('watermark').style.display = 'block';
-        }
-
-        // FUNGSI MATIKAN SISTEM (MODE STANDBY)
-        function matikanSistem() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('layar-mati').classList.add('active');
-            document.body.className = 'bg-standby';
-            document.getElementById('watermark').style.display = 'none';
-        }
-
-        // FUNGSI NYALAKAN KEMBALI
-        function nyalakanSistem() {
-            pindah('welcome');
-        }
-
-        // KONFIGURASI CHART.JS UNTUK HP
-        Chart.defaults.color = '#718096';
-        Chart.defaults.font.family = 'Inter';
-        Chart
+<script>
+    // 1. INIT FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWL
