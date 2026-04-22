@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Dehidrator</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; text-align: center; }
+        .page { display: none; padding: 20px; }
+        .active { display: block; }
+        .btn { background: #007bff; color: white; border: none; padding: 15px 30px; margin: 10px; border-radius: 10px; font-size: 18px; cursor: pointer; width: 80%; max-width: 300px; }
+        .btn-danger { background: #dc3545; }
+        .grid-grafik { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 10px; }
+        canvas { background: white; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+
+    <div id="welcome" class="page active">
+        <br><br>
+        <h1>Selamat Datang di<br>Smart Dehidrator</h1>
+        <p>Solusi Pengeringan Pintar</p>
+        <button class="btn" onclick="pindah('menu')">MULAI</button>
+    </div>
+
+    <div id="menu" class="page">
+        <h2>Menu Utama</h2>
+        <button class="btn" onclick="alert('Mode Daging Dimulai!')">1. Pengeringan Daging</button>
+        <button class="btn" onclick="alert('Mode Buah Dimulai!')">2. Pengeringan Buah</button>
+        <button class="btn" onclick="alert('Mode Sayur Dimulai!')">3. Pengeringan Sayur</button>
+        <button class="btn" onclick="alert('Membuka Panduan...')">4. Panduan Kesehatan</button>
+        <button class="btn" onclick="pindah('grafik')">5. Monitoring (8 Grafik)</button>
+        <button class="btn btn-danger" onclick="pindah('welcome')">6. Matikan</button>
+    </div>
+
+    <div id="grafik" class="page">
+        <h2>Realtime Monitoring</h2>
+        <div class="grid-grafik">
+            <canvas id="chart1"></canvas>
+            <canvas id="chart2"></canvas>
+            <canvas id="chart3"></canvas>
+            <canvas id="chart4"></canvas>
+            <canvas id="chart5"></canvas>
+            <canvas id="chart6"></canvas>
+            <canvas id="chart7"></canvas>
+            <canvas id="chart8"></canvas>
+        </div>
+        <button class="btn" onclick="pindah('menu')">KEMBALI</button>
+    </div>
+
+    <script>
+        // CONFIG FIREBASE (GANTI PAKAI PUNYAMU NU!)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
+            databaseURL: "smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Fungsi Pindah Halaman
+        function pindah(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        // Setup 8 Grafik
+        const ctxs = [1,2,3,4,5,6,7,8].map(i => document.getElementById(`chart${i}`).getContext('2d'));
+        const charts = ctxs.map((ctx, i) => new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: i==7 ? 'Thermo' : `DS18B20-${i+1}`, data: [], borderColor: '#007bff' }] },
+            options: { animation: false }
+        }));
+
+        // Ambil Data dari Firebase (Asumsi folder: monitoring/rak1 sampai rak8)
+        db.ref('monitoring').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if(data) {
+                for(let i=1; i<=8; i++) {
+                    const val = data[`rak${i}`];
+                    updateChart(charts[i-1], val);
+                }
+            }
+        });
+
+        function updateChart(chart, value) {
+            if(chart.data.labels.length > 10) {
+                chart.data.labels.shift();
+                chart.data.datasets[0].data.shift();
+            }
+            chart.data.labels.push(new Date().toLocaleTimeString());
+            chart.data.datasets[0].data.push(value);
+            chart.update();
+        }
+    </script>
+</body>
+</html>
