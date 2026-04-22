@@ -4,123 +4,123 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Smart Dehidrator Pro</title>
+
+    <script>
+        function pindah(id) {
+            // Sembunyikan semua halaman
+            var pages = document.getElementsByClassName('page');
+            for(var i = 0; i < pages.length; i++) {
+                pages[i].style.display = 'none';
+                pages[i].classList.remove('active');
+            }
+            
+            // Tampilkan halaman yang dituju
+            var targetPage = document.getElementById(id);
+            if(id === 'welcome' || id === 'layar-mati') {
+                targetPage.style.display = 'flex';
+            } else {
+                targetPage.style.display = 'block';
+                window.scrollTo(0,0);
+            }
+            targetPage.classList.add('active');
+
+            // Ganti Background App
+            var body = document.body;
+            if(id === 'welcome') body.className = 'bg-home';
+            else if(id === 'layar-mati') body.className = 'bg-standby';
+            else body.className = 'bg-canggih';
+            
+            // Sembunyikan watermark jika layar mati
+            var wm = document.getElementById('watermark');
+            if(wm) wm.style.display = (id === 'layar-mati') ? 'none' : 'block';
+        }
+    </script>
+
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=SF+Pro+Display:wght@300;400;600&display=swap');
 
         :root {
-            --primary: #00e5ff;
-            --primary-glow: rgba(0, 229, 255, 0.4);
-            --bg-dark: #050507;
-            --glass-bg: rgba(20, 25, 35, 0.65);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --danger: #ff2a55;
-            --danger-glow: rgba(255, 42, 85, 0.4);
+            --primary: #00e5ff; --primary-glow: rgba(0, 229, 255, 0.4);
+            --glass-bg: rgba(20, 25, 35, 0.65); --glass-border: rgba(255, 255, 255, 0.08);
+            --danger: #ff2a55; --danger-glow: rgba(255, 42, 85, 0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        
+        /* Background dipindah langsung ke Body biar enteng */
         body { 
-            font-family: 'SF Pro Display', 'Segoe UI', sans-serif; 
-            margin: 0; padding: 0; color: white;
-            background-color: var(--bg-dark);
-            min-height: 100dvh; overflow-x: hidden;
-        }
-
-        #app-container {
-            min-height: 100dvh; width: 100%;
+            font-family: 'SF Pro Display', sans-serif; margin: 0; padding: 0; color: white;
+            min-height: 100vh; overflow-x: hidden; transition: background 0.5s ease;
             background-size: cover; background-position: center; background-attachment: fixed;
-            transition: background 0.8s ease-in-out;
         }
-        
-        .bg-home { background: linear-gradient(to bottom, rgba(5,5,7,0.4) 0%, rgba(5,5,7,0.95) 100%), url('bg.jpg'); }
-        .bg-canggih { background: radial-gradient(circle at 50% -20%, #101c2e 0%, var(--bg-dark) 80%); }
-        .bg-standby { background: #000; }
+        body.bg-home { background-image: linear-gradient(to bottom, rgba(5,5,7,0.4) 0%, rgba(5,5,7,0.95) 100%), url('bg.jpg'); background-color: #050507; }
+        body.bg-canggih { background: radial-gradient(circle at 50% -20%, #101c2e 0%, #050507 80%); }
+        body.bg-standby { background: #000; }
 
-        .page { 
-            display: none; width: 100%; min-height: 100dvh; padding: 20px;
-            animation: fadeSlideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
+        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; animation: fadeUp 0.5s ease forwards; }
+        #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; }
         
-        #welcome, #layar-mati { justify-content: center; align-items: center; flex-direction: column; }
-        
-        .page.active { display: block; }
-        #welcome.active, #layar-mati.active { display: flex; }
-
-        @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card {
-            background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
             border: 1px solid var(--glass-border); border-radius: 28px; padding: 35px 25px;
-            width: 100%; max-width: 500px; margin: 0 auto;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+            width: 100%; max-width: 450px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            position: relative; z-index: 10;
         }
 
-        h1, h2 { font-family: 'Orbitron', sans-serif; margin: 0; }
-        h1 { font-size: 32px; font-weight: 900; background: linear-gradient(90deg, #fff, var(--primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        h2 { font-size: 20px; color: #fff; letter-spacing: 1px; margin-bottom: 20px; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;}
-        .subtitle { font-size: 13px; color: #8e9bb0; letter-spacing: 3px; text-transform: uppercase; margin-top: 8px; margin-bottom: 30px;}
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--primary); margin: 0; }
+        h2 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: #fff; margin: 0 0 20px 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;}
+        .subtitle { font-size: 13px; color: #8e9bb0; letter-spacing: 3px; margin: 5px 0 30px 0; }
 
-        .status-header {
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(0,0,0,0.4); border-radius: 14px; padding: 12px 18px;
-            margin-bottom: 25px; border: 1px solid var(--glass-border);
-        }
-        .status-text { font-family: 'Orbitron', sans-serif; font-size: 10px; color: #8e9bb0; letter-spacing: 2px; }
-        .live-indicator { display: flex; align-items: center; font-size: 10px; font-weight: bold; color: #00ff66; letter-spacing: 1px;}
-        .pulse-dot { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; margin-right: 8px; box-shadow: 0 0 10px #00ff66; animation: pulse 1.5s infinite; }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 102, 0); } }
-
+        /* Tombol Super Responsif */
         .btn-app {
             background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px;
-            color: #fff; width: 100%; padding: 18px 20px; margin-bottom: 15px; font-size: 15px; font-weight: 600;
-            display: flex; align-items: center; cursor: pointer; transition: all 0.2s; position: relative; z-index: 10;
+            color: #fff; width: 100%; padding: 16px 20px; margin-bottom: 15px; font-size: 15px; font-weight: 600;
+            display: flex; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 99;
         }
-        .btn-app:active { transform: scale(0.96); background: rgba(255,255,255,0.08); }
+        .btn-app:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
+        .btn-app span { pointer-events: none; } /* Mencegah klik nyangkut di teks */
         
         .btn-icon { 
             background: rgba(255,255,255,0.05); width: 40px; height: 40px; 
             border-radius: 12px; display: flex; justify-content: center; align-items: center; 
-            margin-right: 15px; font-size: 18px; border: 1px solid var(--glass-border);
+            margin-right: 15px; font-size: 18px; pointer-events: none;
         }
 
-        .btn-primary { background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 102, 255, 0.15)); border: 1px solid var(--primary-glow); justify-content: center;}
-        .btn-primary .btn-icon { background: transparent; border: none; }
+        .btn-primary { background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 102, 255, 0.15)); border-color: var(--primary-glow); justify-content: center;}
+        .btn-primary .btn-icon { background: transparent; }
+        .btn-power { border-color: var(--danger-glow); color: var(--danger); margin-top: 25px;}
 
-        .btn-power { border-color: var(--danger-glow); color: var(--danger); margin-top: 30px;}
-        .btn-power .btn-icon { color: var(--danger); }
+        /* Status & Grafik */
+        .status-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); border-radius: 14px; padding: 12px 18px; margin-bottom: 25px; border: 1px solid var(--glass-border); font-family: 'Orbitron'; font-size: 10px; color: #8e9bb0; }
+        .pulse-dot { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #00ff66; animation: pulse 1s infinite alternate; margin-right: 5px; }
+        @keyframes pulse { from { opacity: 1; } to { opacity: 0.3; } }
 
-        .chart-grid { display: flex; flex-direction: column; gap: 18px; margin-top: 20px; padding-bottom: 80px; }
-        .chart-box { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 15px; height: 220px; }
+        .chart-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 50px; }
+        .chart-box { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 10px; height: 200px; }
 
-        .power-btn-huge {
-            width: 100px; height: 100px; border-radius: 50%; background: transparent; border: 2px solid #333;
-            color: #333; font-size: 40px; display: flex; justify-content: center; align-items: center;
-            cursor: pointer; margin-bottom: 20px; position: relative; z-index: 10;
-        }
-        .power-btn-huge:active { border-color: #fff; color: #fff; }
-        .standby-text { font-family: 'Orbitron'; color: #444; letter-spacing: 5px; font-size: 14px;}
+        .standby-btn { font-size: 50px; color: #333; background: none; border: 2px solid #333; width: 120px; height: 120px; border-radius: 50%; cursor: pointer; transition: 0.3s; z-index: 99;}
+        .standby-btn:active { color: #fff; border-color: #fff; }
 
-        .watermark { position: fixed; bottom: 20px; width: 100%; text-align: center; font-size: 11px; color: #555; letter-spacing: 2px; z-index: 1; pointer-events: none;}
+        .watermark { position: fixed; bottom: 15px; width: 100%; text-align: center; font-size: 11px; color: #555; letter-spacing: 2px; z-index: 1;}
         .watermark span { color: var(--primary); font-weight: bold; }
     </style>
 </head>
-<body>
+<body class="bg-home">
 
-<div id="app-container" class="bg-home">
-
-    <div id="welcome" class="page active">
-        <div class="glass-card" style="text-align: center; background: rgba(10, 15, 25, 0.4); border: none; box-shadow: none;">
+    <div id="welcome" class="page" style="display: flex;">
+        <div class="glass-card" style="text-align: center; background: transparent; border: none; box-shadow: none;">
             <div style="font-size: 60px; filter: drop-shadow(0 0 20px var(--primary)); margin-bottom: 10px;">💠</div>
             <h1>D-HYDRATE</h1>
             <div class="subtitle">PRO EDITION V2.5</div>
             
-            <button type="button" class="btn-app btn-primary" style="margin-top: 40px;" onclick="pindah('menu')">
-                <span style="letter-spacing: 1px; font-weight: bold;">INITIALIZE SYSTEM</span>
+            <button class="btn-app btn-primary" style="margin-top: 40px;" onclick="pindah('menu')">
+                <span>INITIALIZE SYSTEM</span>
             </button>
         </div>
     </div>
@@ -128,37 +128,115 @@
     <div id="menu" class="page">
         <div class="glass-card">
             <div class="status-header">
-                <div class="status-text">TERMINAL: ONLINE</div>
-                <div class="live-indicator"><div class="pulse-dot"></div> SYNCED</div>
+                <div>TERMINAL: ONLINE</div>
+                <div style="color: #00ff66;"><span class="pulse-dot"></span> SYNCED</div>
             </div>
             
             <h2>CONTROL PANEL</h2>
             
-            <button type="button" class="btn-app" onclick="alert('Membuka Panduan Penggunaan Sistem...')">
+            <button class="btn-app" onclick="alert('Membuka Panduan...')">
                 <div class="btn-icon">📖</div><span>Buku Pengetahuan</span>
             </button>
-            <button type="button" class="btn-app" onclick="alert('Parameter Daging Dimuat. Menyesuaikan suhu...')">
+            <button class="btn-app" onclick="alert('Parameter Daging Dimuat!')">
                 <div class="btn-icon">🥩</div><span>Pengeringan Daging</span>
             </button>
-            <button type="button" class="btn-app" onclick="alert('Parameter Buah Dimuat. Menyesuaikan suhu...')">
+            <button class="btn-app" onclick="alert('Parameter Buah Dimuat!')">
                 <div class="btn-icon">🍎</div><span>Pengeringan Buah</span>
             </button>
-            <button type="button" class="btn-app" onclick="alert('Parameter Sayur Dimuat. Mengatur kipas...')">
+            <button class="btn-app" onclick="alert('Parameter Sayur Dimuat!')">
                 <div class="btn-icon">🥬</div><span>Pengeringan Sayur</span>
             </button>
             
-            <button type="button" class="btn-app btn-primary" style="margin-top: 25px;" onclick="pindah('grafik')">
+            <button class="btn-app btn-primary" style="margin-top: 25px;" onclick="pindah('grafik')">
                 <div class="btn-icon">📈</div><span>REALTIME MONITORING</span>
             </button>
             
-            <button type="button" class="btn-app btn-power" onclick="pindah('layar-mati')">
+            <button class="btn-app btn-power" onclick="pindah('layar-mati')">
                 <div class="btn-icon">⏻</div><span>SHUT DOWN</span>
             </button>
         </div>
     </div>
 
     <div id="grafik" class="page">
-        <div class="glass-card" style="padding: 20px; background: rgba(10,15,25,0.85);">
+        <div class="glass-card" style="padding: 20px;">
             <div class="status-header" style="margin-bottom: 15px;">
-                <div class="status-text">SENSOR DATA</div>
-                <div class="live-indicator">
+                <div>SENSOR DATA</div>
+                <div style="color: #00ff66;"><span class="pulse-dot"></span> LIVE</div>
+            </div>
+            
+            <button class="btn-app" style="justify-content: center; padding: 12px; margin-bottom: 15px;" onclick="pindah('menu')">
+                <span>⬅ KEMBALI KE PANEL</span>
+            </button>
+
+            <div class="chart-grid">
+                <div class="chart-box"><canvas id="chart1"></canvas></div>
+                <div class="chart-box"><canvas id="chart2"></canvas></div>
+                <div class="chart-box"><canvas id="chart3"></canvas></div>
+                <div class="chart-box"><canvas id="chart4"></canvas></div>
+                <div class="chart-box"><canvas id="chart5"></canvas></div>
+                <div class="chart-box"><canvas id="chart6"></canvas></div>
+                <div class="chart-box"><canvas id="chart7"></canvas></div>
+                <div class="chart-box"><canvas id="chart8"></canvas></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="layar-mati" class="page">
+        <button class="standby-btn" onclick="pindah('welcome')">⏻</button>
+        <div style="font-family: 'Orbitron'; color: #444; margin-top: 20px; letter-spacing: 5px;">SYSTEM OFFLINE</div>
+    </div>
+
+    <div class="watermark" id="watermark">POWERED BY <span>DAZA STORE</span></div>
+
+    <script>
+        window.addEventListener('load', function() {
+            try {
+                firebase.initializeApp({
+                    apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
+                    databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
+                });
+                const db = firebase.database();
+
+                Chart.defaults.color = '#8e9bb0';
+                Chart.defaults.font.family = "'SF Pro Display', sans-serif";
+                
+                const charts = [1,2,3,4,5,6,7,8].map(i => {
+                    const ctx = document.getElementById(`chart${i}`).getContext('2d');
+                    let grad = ctx.createLinearGradient(0, 0, 0, 200);
+                    grad.addColorStop(0, 'rgba(0, 229, 255, 0.4)');
+                    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+                    return new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: [], datasets: [{ 
+                            label: i==7 ? '🌡 SUHU UTAMA (°C)' : `📊 RAK ${i}`, 
+                            data: [], borderColor: '#00e5ff', backgroundColor: grad,
+                            borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true
+                        }] },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false,
+                            scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } },
+                            animation: false
+                        }
+                    });
+                });
+
+                db.ref('monitoring').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) {
+                        for(let i=1; i<=8; i++) {
+                            if(data[`rak${i}`] !== undefined) {
+                                let c = charts[i-1];
+                                if(c.data.labels.length > 10) { c.data.labels.shift(); c.data.datasets[0].data.shift(); }
+                                c.data.labels.push(new Date().toLocaleTimeString('id-ID'));
+                                c.data.datasets[0].data.push(data[`rak${i}`]);
+                                c.update();
+                            }
+                        }
+                    }
+                });
+            } catch(e) { console.error(e); }
+        });
+    </script>
+</body>
+</html>
