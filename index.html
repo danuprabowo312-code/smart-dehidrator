@@ -2,199 +2,286 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Dehidrator Pro</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Smart Dehidrator OS V.2</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@300;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Inter:wght@300;400;600&display=swap');
 
-        /* 1. BACKGROUND DINAMIS */
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-blue-dim: rgba(0, 243, 255, 0.2);
+            --dark-bg: #070b14;
+            --panel-bg: rgba(12, 18, 34, 0.85);
+            --danger: #ff3333;
+        }
+
+        /* 1. GLOBAL STYLES (DIOPTIMALKAN UNTUK HP) */
         body { 
-            font-family: 'Poppins', sans-serif; 
+            font-family: 'Inter', sans-serif; 
             margin: 0; 
             color: white;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            transition: all 0.5s ease-in-out;
-            padding-bottom: 50px; /* Ruang untuk footer */
+            background-color: var(--dark-bg);
+            transition: background 0.5s ease;
+            -webkit-tap-highlight-color: transparent; /* Hilangkan blok biru saat dipencet di HP */
         }
 
-        /* Background Halaman Utama (Gambar 3D) */
         body.bg-home {
-            background: linear-gradient(rgba(10, 15, 30, 0.7), rgba(10, 15, 30, 0.9)), url('bg.jpg') center/cover no-repeat fixed;
+            background: linear-gradient(rgba(7, 11, 20, 0.7), rgba(7, 11, 20, 0.95)), url('bg.jpg') center/cover no-repeat fixed;
         }
 
-        /* Background Halaman Dalam (Cyber Tech) */
         body.bg-canggih {
-            background-color: #0b0f19;
             background-image: 
-                radial-gradient(circle at 50% 0%, #1a365d 0%, transparent 50%),
-                linear-gradient(rgba(0, 210, 255, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 210, 255, 0.05) 1px, transparent 1px);
+                radial-gradient(circle at 50% 0%, rgba(0, 243, 255, 0.1) 0%, transparent 70%),
+                linear-gradient(rgba(0, 243, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.02) 1px, transparent 1px);
             background-size: 100% 100%, 30px 30px, 30px 30px;
             background-attachment: fixed;
         }
 
-        /* 2. KOTAK KONTEN (GLASSMORPHISM) */
+        /* Mode Standby / Layar Mati */
+        body.bg-standby {
+            background: radial-gradient(circle at center, #161e2e 0%, #050505 100%);
+        }
+
+        /* 2. CONTAINER & PANELS */
         .page { 
             display: none; 
-            padding: 30px 20px; 
-            width: 90%;
-            max-width: 500px;
-            background: rgba(16, 25, 45, 0.6);
+            width: 100%;
+            min-height: 100vh;
+            padding: 20px 15px 70px 15px; /* Ruang bawah untuk watermark */
+            box-sizing: border-box;
+            animation: bootUp 0.5s ease-out forwards;
+        }
+        
+        /* Flex center khusus untuk halaman welcome dan mati */
+        #welcome, #layar-mati {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .page.active { display: block; }
+        #welcome.active, #layar-mati.active { display: flex; }
+
+        @keyframes bootUp {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel-glass {
+            background: var(--panel-bg);
             backdrop-filter: blur(12px);
-            border-radius: 20px;
-            border: 1px solid rgba(0, 210, 255, 0.3);
-            box-shadow: 0 0 20px rgba(0, 210, 255, 0.1);
-            margin: 20px 0;
-            animation: fadeIn 0.5s ease;
-            position: relative;
-            z-index: 10;
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-top: 2px solid var(--neon-blue);
+            border-radius: 16px;
+            padding: 25px 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4), inset 0 0 15px rgba(0, 243, 255, 0.03);
+            width: 100%;
+            max-width: 400px; /* Ukuran pas untuk HP */
+            margin: 0 auto;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .active { display: block; }
 
         /* 3. TYPOGRAPHY */
-        h1 { 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 28px; 
-            color: #00d2ff;
-            text-shadow: 0 0 10px rgba(0, 210, 255, 0.5);
-            margin-bottom: 5px; 
+        h1, h2, h3 { 
+            font-family: 'Rajdhani', sans-serif; 
+            text-transform: uppercase;
+            margin: 0 0 5px 0;
         }
-        h3 { font-family: 'Orbitron', sans-serif; color: #00d2ff; text-align: center; border-bottom: 1px solid rgba(0,210,255,0.3); padding-bottom: 10px;}
-        p { opacity: 0.8; font-weight: 300; font-size: 14px; }
+        h1 { font-size: 28px; color: var(--neon-blue); text-shadow: 0 0 10px var(--neon-blue-dim); letter-spacing: 1px;}
+        .subtitle { font-size: 11px; color: #8892b0; letter-spacing: 2px; font-weight: 600; margin-bottom: 25px;}
 
-        /* 4. TOMBOL KEREN */
-        .btn { 
-            background: rgba(0, 0, 0, 0.4);
-            color: #fff; 
-            border: 1px solid rgba(0, 210, 255, 0.4);
-            padding: 15px 20px; 
-            margin: 10px 0; 
-            border-radius: 12px; 
-            font-size: 15px; 
-            font-weight: 600;
-            cursor: pointer; 
+        /* Status Header */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            font-family: 'Rajdhani', sans-serif;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            color: #a0aec0;
+        }
+        .live-dot {
+            height: 6px; width: 6px;
+            background-color: #00ff00;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 5px #00ff00;
+            animation: blink 1.5s infinite;
+        }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* 4. BUTTONS / MENU ITEMS */
+        .btn-menu {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 3px solid #4a5568;
+            color: #e2e8f0;
             width: 100%;
-            transition: all 0.3s ease;
-            text-align: left;
+            padding: 16px 15px; /* Lebih nyaman di tap */
+            margin-bottom: 12px;
+            border-radius: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
+        .btn-menu:active { transform: scale(0.98); } /* Efek pencet HP */
+        
+        .btn-menu .icon { margin-right: 12px; font-size: 16px; width: 20px; text-align: center;}
 
-        .btn:hover {
-            background: rgba(0, 210, 255, 0.1);
-            border-color: #00d2ff;
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.4);
-            transform: translateX(5px);
-        }
+        .btn-primary { border-left: 3px solid var(--neon-blue); background: linear-gradient(90deg, rgba(0, 243, 255, 0.05), transparent); }
+        .btn-danger { border-left: 3px solid var(--danger); margin-top: 10px;}
 
-        .number-icon { background: rgba(0,210,255,0.2); color: #00d2ff; padding: 5px 12px; border-radius: 8px; margin-right: 15px; font-weight: bold; }
-
-        /* TOMBOL FITUR AI */
-        .btn-ai {
-            background: linear-gradient(45deg, #00d2ff, #3a7bd5);
-            border: none;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
-        }
-        .btn-ai:hover {
-            background: linear-gradient(45deg, #3a7bd5, #00d2ff);
-            box-shadow: 0 0 25px rgba(0, 210, 255, 0.8);
-            transform: scale(1.02);
-        }
-        .btn-ai .number-icon { background: rgba(0,0,0,0.3); color: white; }
-
-        .btn-danger { background: rgba(220, 53, 69, 0.8); border: 1px solid #ff4d4d; text-align: center; justify-content: center; margin-top: 20px;}
-        .btn-danger:hover { background: #ff4d4d; color: white; transform: scale(1.02); box-shadow: 0 0 15px rgba(220, 53, 69, 0.6); }
-
-        /* 5. TATA LETAK GRAFIK */
+        /* 5. CHARTS GRID (KHUSUS HP) */
         .grid-grafik { 
             display: grid; 
-            grid-template-columns: 1fr; 
+            grid-template-columns: 1fr; /* 1 Kolom ke bawah buat HP */
             gap: 15px; 
-            margin-top: 20px;
+            margin-top: 15px;
         }
-        canvas { 
-            background: rgba(0, 0, 0, 0.5); 
-            border: 1px solid rgba(0,210,255,0.2);
-            border-radius: 12px; 
+        .chart-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
             padding: 10px;
+            height: 180px; /* Tinggi Fix biar proporsional di HP */
+            position: relative;
         }
 
-        /* 6. FOOTER DAZA STORE */
-        .footer {
-            position: fixed;
-            bottom: 15px;
+        /* 6. LAYAR STANDBY / MATI */
+        .standby-icon {
+            font-size: 50px;
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(0,0,0,0.5);
+        }
+        .standby-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 20px;
+            color: #4a5568;
+            letter-spacing: 3px;
+        }
+        .btn-reboot {
+            margin-top: 40px;
+            background: transparent;
+            border: 1px solid #4a5568;
+            color: #718096;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-family: 'Inter';
+            font-size: 11px;
+            letter-spacing: 1px;
+            cursor: pointer;
+        }
+
+        /* 7. WATERMARK */
+        .watermark { 
+            position: fixed; 
+            bottom: 15px; 
             width: 100%;
             text-align: center;
-            font-size: 12px;
-            color: rgba(255,255,255,0.5);
+            font-family: 'Rajdhani', sans-serif; 
+            font-size: 10px; 
+            color: rgba(255,255,255,0.3); 
             letter-spacing: 2px;
-            font-family: 'Orbitron', sans-serif;
-            z-index: 1;
+            z-index: 10;
         }
-        .footer span { color: #00d2ff; font-weight: bold; text-shadow: 0 0 5px rgba(0,210,255,0.8); }
+        .watermark span { color: rgba(0, 243, 255, 0.5); font-weight: bold;}
     </style>
 </head>
 <body class="bg-home">
 
     <div id="welcome" class="page active">
-        <div style="text-align: center;">
-            <div style="font-size: 60px; text-shadow: 0 0 20px #00d2ff;">💠</div>
-            <h1>Smart Dehidrator</h1>
-            <p>Sistem Kontrol & Monitoring IoT V.1</p>
-            <br><br>
-            <button class="btn btn-ai" style="justify-content: center;" onclick="pindah('menu')">INISIALISASI SISTEM 🚀</button>
+        <div class="panel-glass" style="text-align: center;">
+            <div style="font-size: 45px; margin-bottom: 10px; filter: drop-shadow(0 0 10px var(--neon-blue));">⬢</div>
+            <h1>SYSTEM ONLINE</h1>
+            <div class="subtitle">SMART DEHYDRATOR V2.0</div>
+            
+            <button class="btn-menu btn-primary" style="justify-content: center; margin-top: 20px;" onclick="pindah('menu')">
+                MASUK KE SISTEM
+            </button>
         </div>
     </div>
 
     <div id="menu" class="page">
-        <h3>Pusat Kendali</h3>
-        
-        <button class="btn btn-ai" onclick="alert('⚡ Mengaktifkan AI Auto-Dry... Sensor mendeteksi kelembaban bahan dan menyesuaikan suhu secara real-time!')">
-            <span class="number-icon">★</span> Mode AI Auto-Dry
-        </button>
-
-        <button class="btn" onclick="alert('Memuat parameter Daging...')"><span class="number-icon">1</span> Pengeringan Daging</button>
-        <button class="btn" onclick="alert('Memuat parameter Buah...')"><span class="number-icon">2</span> Pengeringan Buah</button>
-        <button class="btn" onclick="alert('Memuat parameter Sayur...')"><span class="number-icon">3</span> Pengeringan Sayur</button>
-        <button class="btn" onclick="pindah('grafik')"><span class="number-icon">4</span> Realtime Monitoring</button>
-        
-        <button class="btn btn-danger" onclick="pindah('welcome')">MATIKAN MESIN</button>
-    </div>
-
-    <div id="grafik" class="page" style="max-width: 800px; width: 95%;">
-        <h3>Data Sensor Realtime</h3>
-        <p style="text-align: center; color: #00d2ff;">Status Koneksi: Terhubung ke Database Server</p>
-        <div class="grid-grafik">
-            <canvas id="chart1"></canvas>
-            <canvas id="chart2"></canvas>
-            <canvas id="chart3"></canvas>
-            <canvas id="chart4"></canvas>
-            <canvas id="chart5"></canvas>
-            <canvas id="chart6"></canvas>
-            <canvas id="chart7"></canvas>
-            <canvas id="chart8"></canvas>
+        <div class="panel-glass">
+            <div class="status-bar">
+                <span>ID: SMT-DHD-01</span>
+                <span><span class="live-dot"></span> CONNECTED</span>
+            </div>
+            
+            <h2 style="font-size: 18px; margin-bottom: 15px; color: #fff;">PANEL KONTROL</h2>
+            
+            <button class="btn-menu" onclick="alert('Membuka Panduan Penggunaan Sistem...')">
+                <span class="icon">📖</span> Buku Pengetahuan
+            </button>
+            <button class="btn-menu" onclick="alert('Parameter Pengeringan Daging Dimuat. Memanaskan Heater...')">
+                <span class="icon">🥩</span> Pengeringan Daging
+            </button>
+            <button class="btn-menu" onclick="alert('Parameter Pengeringan Buah Dimuat. Menyesuaikan Suhu...')">
+                <span class="icon">🍎</span> Pengeringan Buah
+            </button>
+            <button class="btn-menu" onclick="alert('Parameter Pengeringan Sayur Dimuat. Mengatur Kipas...')">
+                <span class="icon">🥬</span> Pengeringan Sayur
+            </button>
+            <button class="btn-menu btn-primary" onclick="pindah('grafik')">
+                <span class="icon">📊</span> Realtime Monitoring
+            </button>
+            
+            <button class="btn-menu btn-danger" onclick="matikanSistem()">
+                <span class="icon" style="color: var(--danger);">⏻</span> SHUT DOWN SYSTEM
+            </button>
         </div>
-        <button class="btn btn-danger" onclick="pindah('menu')">KEMBALI KE KENDALI</button>
     </div>
 
-    <div class="footer">DIBUAT OLEH <span>DAZA STORE</span></div>
+    <div id="grafik" class="page">
+        <div class="panel-glass">
+            <div class="status-bar">
+                <span>LIVE SENSOR DATA</span>
+                <span><span class="live-dot"></span> SYNCING...</span>
+            </div>
+            
+            <div class="grid-grafik">
+                <div class="chart-container"><canvas id="chart1"></canvas></div>
+                <div class="chart-container"><canvas id="chart2"></canvas></div>
+                <div class="chart-container"><canvas id="chart3"></canvas></div>
+                <div class="chart-container"><canvas id="chart4"></canvas></div>
+                <div class="chart-container"><canvas id="chart5"></canvas></div>
+                <div class="chart-container"><canvas id="chart6"></canvas></div>
+                <div class="chart-container"><canvas id="chart7"></canvas></div>
+                <div class="chart-container"><canvas id="chart8"></canvas></div>
+            </div>
+            
+            <button class="btn-menu" style="justify-content: center; margin-top: 20px;" onclick="pindah('menu')">
+                KEMBALI KE MENU
+            </button>
+        </div>
+    </div>
+
+    <div id="layar-mati" class="page">
+        <div class="standby-icon">⏻</div>
+        <div class="standby-text">SYSTEM STANDBY</div>
+        
+        <button class="btn-reboot" onclick="nyalakanSistem()">REBOOT SYSTEM</button>
+    </div>
+
+    <div class="watermark" id="watermark">POWERED BY <span>DAZA STORE</span></div>
 
     <script>
-        // CONFIG FIREBASE (URL SUDAH DIPERBAIKI DENGAN HTTPS)
+        // INISIALISASI FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
             databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
@@ -202,70 +289,32 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Logika Pindah Halaman & Ganti Background
+        // FUNGSI PINDAH HALAMAN
         function pindah(id) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0,0);
 
-            // Ganti tema background sesuai halaman
-            if(id === 'welcome') {
-                document.body.className = 'bg-home';
-            } else {
-                document.body.className = 'bg-canggih';
-            }
+            if(id === 'welcome') document.body.className = 'bg-home';
+            else document.body.className = 'bg-canggih';
+            
+            document.getElementById('watermark').style.display = 'block';
         }
 
-        // Konfigurasi Tampilan Grafik (Dark Mode)
-        Chart.defaults.color = '#fff';
-        Chart.defaults.borderColor = 'rgba(255,255,255,0.1)';
-        
-        const ctxs = [1,2,3,4,5,6,7,8].map(i => document.getElementById(`chart${i}`).getContext('2d'));
-        const charts = ctxs.map((ctx, i) => new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ 
-                label: i==7 ? 'Suhu Utama (°C)' : `Rak ${i} (°C)`, 
-                data: [], 
-                borderColor: '#00d2ff',
-                backgroundColor: 'rgba(0, 210, 255, 0.2)',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#fff',
-                pointRadius: 3
-            }] },
-            options: { 
-                scales: { y: { beginAtZero: false } },
-                plugins: { legend: { display: true } },
-                animation: { duration: 500 }
-            }
-        }));
-
-        // Ambil Data Firebase Realtime
-        db.ref('monitoring').on('value', (snapshot) => {
-            const data = snapshot.val();
-            if(data) {
-                for(let i=1; i<=8; i++) {
-                    const val = data[`rak${i}`];
-                    if(val !== undefined) updateChart(charts[i-1], val);
-                }
-            }
-        });
-
-        function updateChart(chart, value) {
-            const now = new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-            if(chart.data.labels.length > 7) {
-                chart.data.labels.shift();
-                chart.data.datasets[0].data.shift();
-            }
-            chart.data.labels.push(now);
-            chart.data.datasets[0].data.push(value);
-            chart.update();
+        // FUNGSI MATIKAN SISTEM (MODE STANDBY)
+        function matikanSistem() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('layar-mati').classList.add('active');
+            document.body.className = 'bg-standby';
+            document.getElementById('watermark').style.display = 'none';
         }
-    </script>
-</body>
-    
-</html>
 
+        // FUNGSI NYALAKAN KEMBALI
+        function nyalakanSistem() {
+            pindah('welcome');
+        }
 
-
+        // KONFIGURASI CHART.JS UNTUK HP
+        Chart.defaults.color = '#718096';
+        Chart.defaults.font.family = 'Inter';
+        Chart
