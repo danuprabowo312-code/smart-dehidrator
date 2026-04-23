@@ -21,11 +21,14 @@
         body.bg-app { background: linear-gradient(180deg, #060e1a 0%, #020407 100%); }
         body.bg-standby { background: #000; }
 
-        /* PAGE LAYOUT - Paling aman */
+        /* PAGE LAYOUT (Sistem Class Active ANTI-BLANK) */
         .page { display: none; width: 100%; min-height: 100vh; padding: 20px; animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .page.active { display: block; } /* Cuma yang aktif yang di-block */
         
-        #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+        /* Flexbox khusus untuk layar welcome & mati */
+        #welcome.active, #layar-mati.active { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* TYPOGRAPHY */
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
@@ -93,80 +96,4 @@
 
         .watermark { text-align: center; font-size: 10px; color: #444; letter-spacing: 3px; margin-top: 20px; }
     </style>
-
-    <script>
-        // FUNGSI PINDAH HALAMAN PALING AMAN (KEMBALI KE VERSI STABIL)
-        function pindah(id) {
-            // 1. Matikan semua layar dulu
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('grafik').style.display = 'none';
-            document.getElementById('layar-mati').style.display = 'none';
-
-            // 2. Nyalakan layar tujuan
-            var target = document.getElementById(id);
-            if(id === 'welcome' || id === 'layar-mati') {
-                target.style.display = 'flex';
-            } else {
-                target.style.display = 'block';
-                window.scrollTo(0,0);
-            }
-
-            // 3. Atur background
-            document.body.className = '';
-            if(id === 'welcome') document.body.className = 'bg-welcome';
-            else if(id === 'layar-mati') document.body.className = 'bg-standby';
-            else document.body.className = 'bg-app';
-
-            // 4. Panggil data Firebase kalau masuk menu / grafik
-            if(id === 'menu' || id === 'grafik') {
-                jalankanSistemData();
-            }
-        }
-    </script>
 </head>
-
-<body class="bg-welcome">
-
-    <div id="welcome" class="page" style="display: flex;">
-        <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; background: #00e5ff; box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0 20px #fff; display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
-            <div style="width: 100px; height: 100px; background: #050b14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px;">🧊</div>
-        </div>
-        
-        <h1 class="title font-orbitron">D-HYDRATE</h1>
-        <div class="subtitle font-orbitron">PRO EDITION V3.0</div>
-        
-        <button class="btn-glass" style="max-width: 250px; justify-content: center; border-color: #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.2);" onclick="pindah('menu')">
-            <span class="font-orbitron" style="color:#00e5ff; pointer-events:none;">INITIALIZE SYSTEM</span>
-        </button>
-    </div>
-
-    <div id="menu" class="page">
-        <div class="glass-panel">
-            <div class="status-bar font-orbitron">
-                <div>TERMINAL: ONLINE</div>
-                <div class="synced"><span class="pulse"></span> SYNCED</div>
-            </div>
-
-            <h2 class="font-jura" style="font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; text-align:center;">CONTROL PANEL</h2>
-
-            <button class="btn-glass" onclick="alert('Membuka Panduan')"><span class="icon">📖</span> <span style="pointer-events:none;">Buku Panduan</span></button>
-            <button class="btn-glass" onclick="alert('Seting Daging')"><span class="icon">🥩</span> <span style="pointer-events:none;">Pengeringan Daging</span> <span class="icon-right">🌡️</span></button>
-            <button class="btn-glass" onclick="alert('Seting Sayur')"><span class="icon">🥬</span> <span style="pointer-events:none;">Pengeringan Sayur</span> <span class="icon-right">🌿</span></button>
-            <button class="btn-glass" onclick="alert('Seting Buah')"><span class="icon">🍎</span> <span style="pointer-events:none;">Pengeringan Buah</span> <span class="icon-right">🍋</span></button>
-
-            <div class="dashboard-widget">
-                <div class="widget-kiri">
-                    <div style="font-size: 10px; color: #888; font-weight:bold; letter-spacing:1px; margin-bottom:5px;">MONITOR SUHU (°C)</div>
-                    <div style="height: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%;">
-                        <canvas id="c-mini"></canvas>
-                    </div>
-                    <div class="mini-stat-grid">
-                        <div class="mini-stat font-orbitron" style="color: #00ff66;">R1: <span id="dash-r1">--</span>°</div>
-                        <div class="mini-stat font-orbitron" style="color: #00e5ff;">R2: <span id="dash-r2">--</span>°</div>
-                        <div class="mini-stat font-orbitron" style="color: #ffcc00;">R3: <span id="dash-r3">--</span>°</div>
-                        <div class="mini-stat font-orbitron" style="color: #cc00ff;">R4: <span id="dash-r4">--</span>°</div>
-                    </div>
-                </div>
-                <div class="widget-kanan">
-                    <svg width="40" height="
