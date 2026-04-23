@@ -12,7 +12,7 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
         body { 
             font-family: 'SF Pro Display', sans-serif; color: white; min-height: 100vh; overflow-x: hidden; 
-            transition: background 0.5s ease; background-color: #03070d;
+            background-color: #03070d; transition: background 0.3s ease;
         }
         body::-webkit-scrollbar { display: none; }
         
@@ -21,10 +21,8 @@
         body.bg-app { background: linear-gradient(180deg, #060e1a 0%, #020407 100%); }
         body.bg-standby { background: #000; }
 
-        /* ANIMATION YANG SUDAH DIPERBAIKI */
-        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-        .page.active { opacity: 1; transform: translateY(0); }
-        
+        /* PAGE LAYOUT - Paling aman pakai display none biasa */
+        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; }
         #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
         /* TYPOGRAPHY */
@@ -56,15 +54,14 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; 
             width: 100%; padding: 18px; margin-bottom: 12px; font-size: 16px; font-weight: 600; 
-            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; position: relative;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            display: flex; align-items: center; gap: 15px; cursor: pointer; position: relative;
         }
-        .btn-glass:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
-        .btn-glass .icon { font-size: 24px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+        .btn-glass:active { background: rgba(255,255,255,0.15); }
+        .btn-glass .icon { font-size: 24px; pointer-events: none; }
 
         .btn-shutdown {
             background: rgba(255, 0, 50, 0.05); border-color: rgba(255, 42, 85, 0.3); color: #ff2a55; 
-            justify-content: center; margin-top: 15px; text-shadow: 0 0 10px rgba(255,42,85,0.4);
+            justify-content: center; margin-top: 15px;
         }
 
         /* GRID RAK GRAFIK */
@@ -72,11 +69,10 @@
         .card-grafik {
             background: linear-gradient(180deg, rgba(20,25,35,0.8) 0%, rgba(10,15,20,0.9) 100%);
             border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 12px;
-            box-shadow: inset 0 2px 20px rgba(255,255,255,0.02), 0 5px 15px rgba(0,0,0,0.5);
-            height: 140px; position: relative;
+            box-shadow: inset 0 2px 20px rgba(255,255,255,0.02); height: 140px; position: relative;
         }
         .card-grafik .header-rak { display: flex; justify-content: flex-end; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
-        .card-grafik .label-bawah { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 8px; color: #666; }
+        .card-grafik .label-bawah { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 8px; color: #666; left: 0;}
         .canvas-container { height: 90px; width: 100%; }
 
         /* WIDGET DASHBOARD MENU */
@@ -89,28 +85,89 @@
         .mini-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
         .mini-stat { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 5px; font-size: 9px; text-align: center; color: #aaa;}
         
-        /* BOTTOM PILLS */
-        .bottom-pills { display: flex; justify-content: space-between; margin-top: 20px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 12px; }
-        .pill { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; }
-        .pill.active { background: rgba(0,255,102,0.1); border: 1px solid #00ff66; color: #00ff66; }
-
         .watermark { text-align: center; font-size: 10px; color: #444; letter-spacing: 3px; margin-top: 20px; }
     </style>
 
     <script>
-        // FUNGSI PINDAH HALAMAN YANG SUDAH DIPERBAIKI (ANTI BLANK)
+        // FUNGSI PINDAH HALAMAN PALING BASIC & AMAN
         function pindah(id) {
-            // 1. Matikan semua halaman seketika
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.remove('active');
-                p.style.display = 'none';
-            });
+            // Tutup semua
+            document.getElementById('welcome').style.display = 'none';
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('grafik').style.display = 'none';
+            document.getElementById('layar-mati').style.display = 'none';
 
-            // 2. Tentukan target yang mau dibuka
+            // Buka target
             var target = document.getElementById(id);
-            
-            // 3. Atur display-nya
             if(id === 'welcome' || id === 'layar-mati') {
                 target.style.display = 'flex';
             } else {
-                target.style.display =
+                target.style.display = 'block';
+                window.scrollTo(0,0);
+            }
+
+            // Ganti warna background
+            if(id === 'welcome') document.body.className = 'bg-welcome';
+            else if(id === 'layar-mati') document.body.className = 'bg-standby';
+            else document.body.className = 'bg-app';
+
+            // Panggil Firebase JIKA masuk ke menu atau grafik
+            if(id === 'menu' || id === 'grafik') {
+                jalankanSistemBerat();
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-welcome">
+
+    <div id="welcome" class="page" style="display: flex;">
+        <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; background: #00e5ff; box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0 20px #fff; display: flex; justify-content: center; align-items: center; margin-bottom: 20px;">
+            <div style="width: 100px; height: 100px; background: #050b14; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px;">🧊</div>
+        </div>
+        
+        <h1 class="title font-orbitron">D-HYDRATE</h1>
+        <div class="subtitle font-orbitron">PRO EDITION V3.0</div>
+        
+        <button class="btn-glass" style="max-width: 250px; justify-content: center; border-color: #00e5ff; box-shadow: 0 0 20px rgba(0,229,255,0.2);" onclick="pindah('menu')">
+            <span class="font-orbitron" style="color:#00e5ff; pointer-events:none;">INITIALIZE SYSTEM</span>
+        </button>
+    </div>
+
+    <div id="menu" class="page">
+        <div class="glass-panel">
+            <div class="status-bar font-orbitron">
+                <div>TERMINAL: ONLINE</div>
+                <div class="synced"><span class="pulse"></span> SYNCED</div>
+            </div>
+
+            <h2 class="font-jura" style="font-size: 20px; letter-spacing: 2px; margin-bottom: 15px;">CONTROL PANEL</h2>
+
+            <button class="btn-glass" onclick="alert('Membuka Panduan')"><span class="icon">📖</span> <span style="pointer-events:none;">Buku Panduan</span></button>
+            <button class="btn-glass" onclick="alert('Seting Daging')"><span class="icon">🥩</span> <span style="pointer-events:none;">Pengeringan Daging</span> <span class="icon" style="margin-left:auto; font-size: 16px;">🍎</span></button>
+            <button class="btn-glass" onclick="alert('Seting Sayur')"><span class="icon">🥬</span> <span style="pointer-events:none;">Pengeringan Sayur</span> <span class="icon" style="margin-left:auto; font-size: 16px;">🌿</span></button>
+
+            <div class="dashboard-widget">
+                <div class="widget-kiri">
+                    <div style="font-size: 10px; color: #888;">SUHU (°C)</div>
+                    <div style="height: 60px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items:flex-end;">
+                        <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none">
+                            <path d="M0,30 Q20,10 40,25 T80,10 T100,20" fill="none" stroke="#00e5ff" stroke-width="2"/>
+                            <path d="M0,35 Q20,15 40,30 T80,15 T100,25" fill="none" stroke="#ff00cc" stroke-width="2"/>
+                        </svg>
+                    </div>
+                    <div class="mini-stat-grid">
+                        <div class="mini-stat" style="color: #00ff66;">R1-71°</div><div class="mini-stat" style="color: #00e5ff;">R2-73°</div>
+                        <div class="mini-stat" style="color: #ffcc00;">R3-75°</div><div class="mini-stat" style="color: #cc00ff;">R4-72°</div>
+                    </div>
+                </div>
+                <div class="widget-kanan">
+                    <div style="font-size: 40px; margin-bottom: 10px;">🧊</div>
+                    <div style="font-size: 9px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px; margin-bottom: 4px;">Rata Kabin: <span style="color:#fff">72°C</span></div>
+                    <div style="font-size: 9px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px; color: #ff4d4d;">Pemanas: <span style="color:#fff">99°C</span></div>
+                </div>
+            </div>
+
+            <div style="font-size: 12px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">RAK PEMANTAUAN</div>
+            <button class="btn-glass" style="border-color: rgba(0,229,255,0.3); justify-content:center;" onclick="pindah('grafik')">
+                <span style="color: #00e5ff;
