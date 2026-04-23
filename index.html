@@ -5,32 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>D-Hydrate Pro</title>
 
-    <script>
-        function pindah(id) {
-            document.querySelectorAll('.page').forEach(p => {
-                p.classList.remove('active');
-                setTimeout(() => p.style.display = 'none', 300); // Smooth fade out
-            });
-
-            var target = document.getElementById(id);
-            setTimeout(() => {
-                if(id === 'welcome' || id === 'layar-mati') {
-                    target.style.display = 'flex';
-                } else {
-                    target.style.display = 'block';
-                    window.scrollTo(0,0);
-                }
-                setTimeout(() => target.classList.add('active'), 10);
-            }, 300);
-
-            if(id === 'welcome') document.body.className = 'bg-welcome';
-            else if(id === 'layar-mati') document.body.className = 'bg-standby';
-            else document.body.className = 'bg-app';
-
-            if(id === 'grafik' || id === 'menu') jalankanSistemBerat();
-        }
-    </script>
-
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Jura:wght@500;700&family=SF+Pro+Display:wght@400;600&display=swap');
 
@@ -47,8 +21,8 @@
         body.bg-app { background: linear-gradient(180deg, #060e1a 0%, #020407 100%); }
         body.bg-standby { background: #000; }
 
-        /* ANIMATION */
-        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; opacity: 0; transform: translateY(15px); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        /* ANIMATION YANG SUDAH DIPERBAIKI */
+        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
         .page.active { opacity: 1; transform: translateY(0); }
         
         #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
@@ -59,7 +33,7 @@
         h1.title { font-size: 38px; color: #fff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); margin-top: 15px; letter-spacing: 2px;}
         .subtitle { font-size: 11px; color: #00e5ff; letter-spacing: 5px; margin-bottom: 40px; font-weight: bold; }
 
-        /* GLASS CARD (Mirip UI Gambar) */
+        /* GLASS CARD */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
@@ -93,7 +67,7 @@
             justify-content: center; margin-top: 15px; text-shadow: 0 0 10px rgba(255,42,85,0.4);
         }
 
-        /* GRID RAK GRAFIK (Mirip Gambar 4) */
+        /* GRID RAK GRAFIK */
         .grid-grafik { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
         .card-grafik {
             background: linear-gradient(180deg, rgba(20,25,35,0.8) 0%, rgba(10,15,20,0.9) 100%);
@@ -105,7 +79,7 @@
         .card-grafik .label-bawah { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 8px; color: #666; }
         .canvas-container { height: 90px; width: 100%; }
 
-        /* WIDGET DASHBOARD MENU (Mirip Gambar 3) */
+        /* WIDGET DASHBOARD MENU */
         .dashboard-widget {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;
             background: rgba(0,0,0,0.2); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.03);
@@ -122,8 +96,21 @@
 
         .watermark { text-align: center; font-size: 10px; color: #444; letter-spacing: 3px; margin-top: 20px; }
     </style>
-</head>
-<body class="bg-welcome" onload="pindah('welcome')">
 
-    <div id="welcome" class="page">
-        <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; background: #00e5ff; box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0
+    <script>
+        // FUNGSI PINDAH HALAMAN YANG SUDAH DIPERBAIKI (ANTI BLANK)
+        function pindah(id) {
+            // 1. Matikan semua halaman seketika
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                p.style.display = 'none';
+            });
+
+            // 2. Tentukan target yang mau dibuka
+            var target = document.getElementById(id);
+            
+            // 3. Atur display-nya
+            if(id === 'welcome' || id === 'layar-mati') {
+                target.style.display = 'flex';
+            } else {
+                target.style.display =
