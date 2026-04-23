@@ -3,240 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Smart Dehidrator Pro</title>
+    <title>D-Hydrate Pro</title>
 
     <script>
         function pindah(id) {
-            // Sembunyikan semua halaman
-            var pages = document.getElementsByClassName('page');
-            for(var i = 0; i < pages.length; i++) {
-                pages[i].style.display = 'none';
-                pages[i].classList.remove('active');
-            }
-            
-            // Tampilkan halaman yang dituju
-            var targetPage = document.getElementById(id);
-            if(id === 'welcome' || id === 'layar-mati') {
-                targetPage.style.display = 'flex';
-            } else {
-                targetPage.style.display = 'block';
-                window.scrollTo(0,0);
-            }
-            targetPage.classList.add('active');
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+                setTimeout(() => p.style.display = 'none', 300); // Smooth fade out
+            });
 
-            // Ganti Background App
-            var body = document.body;
-            if(id === 'welcome') body.className = 'bg-home';
-            else if(id === 'layar-mati') body.className = 'bg-standby';
-            else body.className = 'bg-canggih';
-            
-            // Sembunyikan watermark jika layar mati
-            var wm = document.getElementById('watermark');
-            if(wm) wm.style.display = (id === 'layar-mati') ? 'none' : 'block';
+            var target = document.getElementById(id);
+            setTimeout(() => {
+                if(id === 'welcome' || id === 'layar-mati') {
+                    target.style.display = 'flex';
+                } else {
+                    target.style.display = 'block';
+                    window.scrollTo(0,0);
+                }
+                setTimeout(() => target.classList.add('active'), 10);
+            }, 300);
+
+            if(id === 'welcome') document.body.className = 'bg-welcome';
+            else if(id === 'layar-mati') document.body.className = 'bg-standby';
+            else document.body.className = 'bg-app';
+
+            if(id === 'grafik' || id === 'menu') jalankanSistemBerat();
         }
     </script>
-
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=SF+Pro+Display:wght@300;400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Jura:wght@500;700&family=SF+Pro+Display:wght@400;600&display=swap');
 
-        :root {
-            --primary: #00e5ff; --primary-glow: rgba(0, 229, 255, 0.4);
-            --glass-bg: rgba(20, 25, 35, 0.65); --glass-border: rgba(255, 255, 255, 0.08);
-            --danger: #ff2a55; --danger-glow: rgba(255, 42, 85, 0.4);
-        }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        
-        /* Background dipindah langsung ke Body biar enteng */
+        /* RESET & GLOBAL */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
         body { 
-            font-family: 'SF Pro Display', sans-serif; margin: 0; padding: 0; color: white;
-            min-height: 100vh; overflow-x: hidden; transition: background 0.5s ease;
-            background-size: cover; background-position: center; background-attachment: fixed;
+            font-family: 'SF Pro Display', sans-serif; color: white; min-height: 100vh; overflow-x: hidden; 
+            transition: background 0.5s ease; background-color: #03070d;
         }
-        body.bg-home { background-image: linear-gradient(to bottom, rgba(5,5,7,0.4) 0%, rgba(5,5,7,0.95) 100%), url('bg.jpg'); background-color: #050507; }
-        body.bg-canggih { background: radial-gradient(circle at 50% -20%, #101c2e 0%, #050507 80%); }
+        body::-webkit-scrollbar { display: none; }
+        
+        /* BACKGROUNDS */
+        body.bg-welcome { background: radial-gradient(circle at 50% 40%, #0d203a 0%, #03070d 80%); }
+        body.bg-app { background: linear-gradient(180deg, #060e1a 0%, #020407 100%); }
         body.bg-standby { background: #000; }
 
-        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; animation: fadeUp 0.5s ease forwards; }
-        #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; }
+        /* ANIMATION */
+        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; opacity: 0; transform: translateY(15px); transition: 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .page.active { opacity: 1; transform: translateY(0); }
         
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
-        .glass-card {
-            background: var(--glass-bg); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid var(--glass-border); border-radius: 28px; padding: 35px 25px;
-            width: 100%; max-width: 450px; margin: 0 auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-            position: relative; z-index: 10;
+        /* TYPOGRAPHY */
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-jura { font-family: 'Jura', sans-serif; }
+        h1.title { font-size: 38px; color: #fff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); margin-top: 15px; letter-spacing: 2px;}
+        .subtitle { font-size: 11px; color: #00e5ff; letter-spacing: 5px; margin-bottom: 40px; font-weight: bold; }
+
+        /* GLASS CARD (Mirip UI Gambar) */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.02);
+            padding: 20px; width: 100%; max-width: 450px; margin: 0 auto; position: relative;
         }
 
-        h1 { font-family: 'Orbitron', sans-serif; font-size: 32px; font-weight: 900; color: #fff; text-shadow: 0 0 15px var(--primary); margin: 0; }
-        h2 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: #fff; margin: 0 0 20px 0; border-bottom: 1px solid var(--glass-border); padding-bottom: 15px;}
-        .subtitle { font-size: 13px; color: #8e9bb0; letter-spacing: 3px; margin: 5px 0 30px 0; }
-
-        /* Tombol Super Responsif */
-        .btn-app {
-            background: rgba(255,255,255,0.03); border: 1px solid var(--glass-border); border-radius: 18px;
-            color: #fff; width: 100%; padding: 16px 20px; margin-bottom: 15px; font-size: 15px; font-weight: 600;
-            display: flex; align-items: center; cursor: pointer; transition: 0.2s; position: relative; z-index: 99;
+        /* STATUS BAR HEADER */
+        .status-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 12px 18px; 
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; font-size: 11px; color: #8e9bb0; letter-spacing: 1px;
         }
-        .btn-app:active { transform: scale(0.95); background: rgba(255,255,255,0.1); }
-        .btn-app span { pointer-events: none; } /* Mencegah klik nyangkut di teks */
+        .status-bar .synced { color: #00ff66; display: flex; align-items: center; text-shadow: 0 0 8px rgba(0,255,102,0.5); }
+        .pulse { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #00ff66; margin-right: 8px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* BUTTONS */
+        .btn-glass {
+            background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; 
+            width: 100%; padding: 18px; margin-bottom: 12px; font-size: 16px; font-weight: 600; 
+            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s; position: relative;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        .btn-glass:active { transform: scale(0.96); background: rgba(255,255,255,0.1); }
+        .btn-glass .icon { font-size: 24px; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
+
+        .btn-shutdown {
+            background: rgba(255, 0, 50, 0.05); border-color: rgba(255, 42, 85, 0.3); color: #ff2a55; 
+            justify-content: center; margin-top: 15px; text-shadow: 0 0 10px rgba(255,42,85,0.4);
+        }
+
+        /* GRID RAK GRAFIK (Mirip Gambar 4) */
+        .grid-grafik { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .card-grafik {
+            background: linear-gradient(180deg, rgba(20,25,35,0.8) 0%, rgba(10,15,20,0.9) 100%);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 12px;
+            box-shadow: inset 0 2px 20px rgba(255,255,255,0.02), 0 5px 15px rgba(0,0,0,0.5);
+            height: 140px; position: relative;
+        }
+        .card-grafik .header-rak { display: flex; justify-content: flex-end; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
+        .card-grafik .label-bawah { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 8px; color: #666; }
+        .canvas-container { height: 90px; width: 100%; }
+
+        /* WIDGET DASHBOARD MENU (Mirip Gambar 3) */
+        .dashboard-widget {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;
+            background: rgba(0,0,0,0.2); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.03);
+        }
+        .widget-kiri { display: flex; flex-direction: column; justify-content: space-between; }
+        .widget-kanan { background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, transparent 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px;}
+        .mini-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .mini-stat { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 5px; font-size: 9px; text-align: center; color: #aaa;}
         
-        .btn-icon { 
-            background: rgba(255,255,255,0.05); width: 40px; height: 40px; 
-            border-radius: 12px; display: flex; justify-content: center; align-items: center; 
-            margin-right: 15px; font-size: 18px; pointer-events: none;
-        }
+        /* BOTTOM PILLS */
+        .bottom-pills { display: flex; justify-content: space-between; margin-top: 20px; background: rgba(0,0,0,0.5); padding: 10px; border-radius: 12px; }
+        .pill { width: 35px; height: 35px; background: rgba(255,255,255,0.05); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666; }
+        .pill.active { background: rgba(0,255,102,0.1); border: 1px solid #00ff66; color: #00ff66; }
 
-        .btn-primary { background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 102, 255, 0.15)); border-color: var(--primary-glow); justify-content: center;}
-        .btn-primary .btn-icon { background: transparent; }
-        .btn-power { border-color: var(--danger-glow); color: var(--danger); margin-top: 25px;}
-
-        /* Status & Grafik */
-        .status-header { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); border-radius: 14px; padding: 12px 18px; margin-bottom: 25px; border: 1px solid var(--glass-border); font-family: 'Orbitron'; font-size: 10px; color: #8e9bb0; }
-        .pulse-dot { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #00ff66; animation: pulse 1s infinite alternate; margin-right: 5px; }
-        @keyframes pulse { from { opacity: 1; } to { opacity: 0.3; } }
-
-        .chart-grid { display: flex; flex-direction: column; gap: 15px; margin-top: 15px; padding-bottom: 50px; }
-        .chart-box { background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); border-radius: 20px; padding: 10px; height: 200px; }
-
-        .standby-btn { font-size: 50px; color: #333; background: none; border: 2px solid #333; width: 120px; height: 120px; border-radius: 50%; cursor: pointer; transition: 0.3s; z-index: 99;}
-        .standby-btn:active { color: #fff; border-color: #fff; }
-
-        .watermark { position: fixed; bottom: 15px; width: 100%; text-align: center; font-size: 11px; color: #555; letter-spacing: 2px; z-index: 1;}
-        .watermark span { color: var(--primary); font-weight: bold; }
+        .watermark { text-align: center; font-size: 10px; color: #444; letter-spacing: 3px; margin-top: 20px; }
     </style>
 </head>
-<body class="bg-home">
+<body class="bg-welcome" onload="pindah('welcome')">
 
-    <div id="welcome" class="page" style="display: flex;">
-        <div class="glass-card" style="text-align: center; background: transparent; border: none; box-shadow: none;">
-            <div style="font-size: 60px; filter: drop-shadow(0 0 20px var(--primary)); margin-bottom: 10px;">💠</div>
-            <h1>D-HYDRATE</h1>
-            <div class="subtitle">PRO EDITION V2.5</div>
-            
-            <button class="btn-app btn-primary" style="margin-top: 40px;" onclick="pindah('menu')">
-                <span>INITIALIZE SYSTEM</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="menu" class="page">
-        <div class="glass-card">
-            <div class="status-header">
-                <div>TERMINAL: ONLINE</div>
-                <div style="color: #00ff66;"><span class="pulse-dot"></span> SYNCED</div>
-            </div>
-            
-            <h2>CONTROL PANEL</h2>
-            
-            <button class="btn-app" onclick="alert('Membuka Panduan...')">
-                <div class="btn-icon">📖</div><span>Buku Pengetahuan</span>
-            </button>
-            <button class="btn-app" onclick="alert('Parameter Daging Dimuat!')">
-                <div class="btn-icon">🥩</div><span>Pengeringan Daging</span>
-            </button>
-            <button class="btn-app" onclick="alert('Parameter Buah Dimuat!')">
-                <div class="btn-icon">🍎</div><span>Pengeringan Buah</span>
-            </button>
-            <button class="btn-app" onclick="alert('Parameter Sayur Dimuat!')">
-                <div class="btn-icon">🥬</div><span>Pengeringan Sayur</span>
-            </button>
-            
-            <button class="btn-app btn-primary" style="margin-top: 25px;" onclick="pindah('grafik')">
-                <div class="btn-icon">📈</div><span>REALTIME MONITORING</span>
-            </button>
-            
-            <button class="btn-app btn-power" onclick="pindah('layar-mati')">
-                <div class="btn-icon">⏻</div><span>SHUT DOWN</span>
-            </button>
-        </div>
-    </div>
-
-    <div id="grafik" class="page">
-        <div class="glass-card" style="padding: 20px;">
-            <div class="status-header" style="margin-bottom: 15px;">
-                <div>SENSOR DATA</div>
-                <div style="color: #00ff66;"><span class="pulse-dot"></span> LIVE</div>
-            </div>
-            
-            <button class="btn-app" style="justify-content: center; padding: 12px; margin-bottom: 15px;" onclick="pindah('menu')">
-                <span>⬅ KEMBALI KE PANEL</span>
-            </button>
-
-            <div class="chart-grid">
-                <div class="chart-box"><canvas id="chart1"></canvas></div>
-                <div class="chart-box"><canvas id="chart2"></canvas></div>
-                <div class="chart-box"><canvas id="chart3"></canvas></div>
-                <div class="chart-box"><canvas id="chart4"></canvas></div>
-                <div class="chart-box"><canvas id="chart5"></canvas></div>
-                <div class="chart-box"><canvas id="chart6"></canvas></div>
-                <div class="chart-box"><canvas id="chart7"></canvas></div>
-                <div class="chart-box"><canvas id="chart8"></canvas></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="layar-mati" class="page">
-        <button class="standby-btn" onclick="pindah('welcome')">⏻</button>
-        <div style="font-family: 'Orbitron'; color: #444; margin-top: 20px; letter-spacing: 5px;">SYSTEM OFFLINE</div>
-    </div>
-
-    <div class="watermark" id="watermark">POWERED BY <span>DAZA STORE</span></div>
-
-    <script>
-        window.addEventListener('load', function() {
-            try {
-                firebase.initializeApp({
-                    apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
-                    databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
-                });
-                const db = firebase.database();
-
-                Chart.defaults.color = '#8e9bb0';
-                Chart.defaults.font.family = "'SF Pro Display', sans-serif";
-                
-                const charts = [1,2,3,4,5,6,7,8].map(i => {
-                    const ctx = document.getElementById(`chart${i}`).getContext('2d');
-                    let grad = ctx.createLinearGradient(0, 0, 0, 200);
-                    grad.addColorStop(0, 'rgba(0, 229, 255, 0.4)');
-                    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-
-                    return new Chart(ctx, {
-                        type: 'line',
-                        data: { labels: [], datasets: [{ 
-                            label: i==7 ? '🌡 SUHU UTAMA (°C)' : `📊 RAK ${i}`, 
-                            data: [], borderColor: '#00e5ff', backgroundColor: grad,
-                            borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true
-                        }] },
-                        options: { 
-                            responsive: true, maintainAspectRatio: false,
-                            scales: { x: { display: false }, y: { grid: { color: 'rgba(255,255,255,0.05)' } } },
-                            animation: false
-                        }
-                    });
-                });
-
-                db.ref('monitoring').on('value', (snapshot) => {
-                    const data = snapshot.val();
-                    if(data) {
-                        for(let i=1; i<=8; i++) {
-                            if(data[`rak${i}`] !== undefined) {
-                                let c = charts[i-1];
-                                if(c.data.labels.length > 10) { c.data.labels.shift(); c.data.datasets[0].data.shift(); }
-                                c.data.labels.push(new Date().toLocaleTimeString('id-ID'));
-                                c.data.datasets[0].data.push(data[`rak${i}`]);
-                                c.update();
-                            }
-                        }
-                    }
-                });
-            } catch(e) { console.error(e); }
-        });
-    </script>
-</body>
-</html>
+    <div id="welcome" class="page">
+        <div style="position: relative; width: 120px; height: 120px; border-radius: 50%; background: #00e5ff; box-shadow: 0 0 50px rgba(0, 229, 255, 0.4), inset 0 0
