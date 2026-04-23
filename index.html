@@ -12,17 +12,20 @@
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
         body { 
             font-family: 'SF Pro Display', sans-serif; color: white; min-height: 100vh; overflow-x: hidden; 
-            background-color: #03070d; transition: background 0.3s ease;
+            background: #03070d; transition: background 0.4s ease-in-out;
         }
         body::-webkit-scrollbar { display: none; }
         
-        /* BACKGROUNDS */
+        /* BACKGROUND CLASSES */
         body.bg-welcome { background: radial-gradient(circle at 50% 40%, #0d203a 0%, #03070d 80%); }
         body.bg-app { background: linear-gradient(180deg, #060e1a 0%, #020407 100%); }
         body.bg-standby { background: #000; }
 
-        /* PAGE LAYOUT - Paling aman pakai display none biasa */
-        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; }
+        /* NAVIGATION SYSTEM */
+        .page { display: none; width: 100%; min-height: 100vh; padding: 20px; animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* LAYOUT FLEX UTK WELCOME & STANDBY */
         #welcome, #layar-mati { flex-direction: column; justify-content: center; align-items: center; text-align: center; }
 
         /* TYPOGRAPHY */
@@ -31,7 +34,7 @@
         h1.title { font-size: 38px; color: #fff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.6); margin-top: 15px; letter-spacing: 2px;}
         .subtitle { font-size: 11px; color: #00e5ff; letter-spacing: 5px; margin-bottom: 40px; font-weight: bold; }
 
-        /* GLASS CARD */
+        /* GLASS CARD UTAMA */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 24px;
@@ -43,62 +46,69 @@
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
             background: rgba(0, 0, 0, 0.4); border-radius: 12px; padding: 12px 18px; 
-            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 25px; font-size: 11px; color: #8e9bb0; letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.05); margin-bottom: 20px; font-size: 11px; color: #8e9bb0; letter-spacing: 1px;
         }
         .status-bar .synced { color: #00ff66; display: flex; align-items: center; text-shadow: 0 0 8px rgba(0,255,102,0.5); }
         .pulse { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; display: inline-block; box-shadow: 0 0 10px #00ff66; margin-right: 8px; animation: blink 1.5s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-        /* BUTTONS */
+        /* BUTTONS STYLING */
         .btn-glass {
             background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%);
             border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; 
-            width: 100%; padding: 18px; margin-bottom: 12px; font-size: 16px; font-weight: 600; 
-            display: flex; align-items: center; gap: 15px; cursor: pointer; position: relative;
+            width: 100%; padding: 16px; margin-bottom: 12px; font-size: 16px; font-weight: 600; 
+            display: flex; align-items: center; gap: 15px; cursor: pointer; transition: 0.2s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        .btn-glass:active { background: rgba(255,255,255,0.15); }
+        .btn-glass:active { transform: scale(0.98); background: rgba(255,255,255,0.12); }
         .btn-glass .icon { font-size: 24px; pointer-events: none; }
+        .btn-glass .icon-right { margin-left: auto; font-size: 20px; opacity: 0.8; pointer-events: none;}
 
         .btn-shutdown {
             background: rgba(255, 0, 50, 0.05); border-color: rgba(255, 42, 85, 0.3); color: #ff2a55; 
-            justify-content: center; margin-top: 15px;
+            justify-content: center; margin-top: 10px; font-family: 'Orbitron', sans-serif; letter-spacing: 1px;
         }
 
-        /* GRID RAK GRAFIK */
-        .grid-grafik { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .card-grafik {
-            background: linear-gradient(180deg, rgba(20,25,35,0.8) 0%, rgba(10,15,20,0.9) 100%);
-            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 12px;
-            box-shadow: inset 0 2px 20px rgba(255,255,255,0.02); height: 140px; position: relative;
-        }
-        .card-grafik .header-rak { display: flex; justify-content: flex-end; font-size: 14px; margin-bottom: 5px; font-weight: bold; }
-        .card-grafik .label-bawah { position: absolute; bottom: 8px; width: 100%; text-align: center; font-size: 8px; color: #666; left: 0;}
-        .canvas-container { height: 90px; width: 100%; }
-
-        /* WIDGET DASHBOARD MENU */
+        /* WIDGET DASHBOARD (Suhu Rata-rata & Pemanas) */
         .dashboard-widget {
             display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin: 20px 0;
-            background: rgba(0,0,0,0.2); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.03);
+            background: rgba(0,0,0,0.3); border-radius: 20px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
         .widget-kiri { display: flex; flex-direction: column; justify-content: space-between; }
-        .widget-kanan { background: radial-gradient(circle, rgba(0,229,255,0.1) 0%, transparent 70%); display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px;}
-        .mini-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-top: 10px; }
-        .mini-stat { background: rgba(255,255,255,0.05); border-radius: 6px; padding: 5px; font-size: 9px; text-align: center; color: #aaa;}
+        .widget-kanan { 
+            background: radial-gradient(circle, rgba(0,229,255,0.15) 0%, rgba(0,0,0,0.2) 80%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            border-radius: 15px; border: 1px solid rgba(0,229,255,0.2); padding: 10px;
+        }
         
+        .mini-stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .mini-stat { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 6px; font-size: 10px; text-align: center; font-weight: bold;}
+        
+        /* GRID GRAFIK (8 RAK) */
+        .grid-grafik { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; margin-bottom: 20px; }
+        .card-grafik {
+            background: linear-gradient(180deg, rgba(20,25,35,0.8) 0%, rgba(10,15,20,0.9) 100%);
+            border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; padding: 10px;
+            box-shadow: inset 0 2px 20px rgba(255,255,255,0.02); height: 130px; position: relative;
+        }
+        .card-grafik .header-rak { display: flex; justify-content: flex-end; font-size: 12px; margin-bottom: 5px; font-weight: bold; }
+        .card-grafik .label-bawah { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 8px; color: #666; left: 0;}
+        .canvas-container { height: 80px; width: 100%; }
+
         .watermark { text-align: center; font-size: 10px; color: #444; letter-spacing: 3px; margin-top: 20px; }
     </style>
 
     <script>
-        // FUNGSI PINDAH HALAMAN PALING BASIC & AMAN
+        // SISTEM NAVIGASI YANG SOLID
         function pindah(id) {
-            // Tutup semua
-            document.getElementById('welcome').style.display = 'none';
-            document.getElementById('menu').style.display = 'none';
-            document.getElementById('grafik').style.display = 'none';
-            document.getElementById('layar-mati').style.display = 'none';
+            // Sembunyikan semua halaman
+            document.querySelectorAll('.page').forEach(page => {
+                page.style.display = 'none';
+            });
 
-            // Buka target
-            var target = document.getElementById(id);
+            // Tampilkan target
+            const target = document.getElementById(id);
             if(id === 'welcome' || id === 'layar-mati') {
                 target.style.display = 'flex';
             } else {
@@ -106,14 +116,15 @@
                 window.scrollTo(0,0);
             }
 
-            // Ganti warna background
-            if(id === 'welcome') document.body.className = 'bg-welcome';
-            else if(id === 'layar-mati') document.body.className = 'bg-standby';
-            else document.body.className = 'bg-app';
+            // Ganti Background Body
+            document.body.className = ''; // reset
+            if(id === 'welcome') document.body.classList.add('bg-welcome');
+            else if(id === 'layar-mati') document.body.classList.add('bg-standby');
+            else document.body.classList.add('bg-app');
 
-            // Panggil Firebase JIKA masuk ke menu atau grafik
+            // Jalankan Firebase & Chart.js kalau masuk menu atau grafik
             if(id === 'menu' || id === 'grafik') {
-                jalankanSistemBerat();
+                jalankanSistemData();
             }
         }
     </script>
@@ -141,33 +152,170 @@
                 <div class="synced"><span class="pulse"></span> SYNCED</div>
             </div>
 
-            <h2 class="font-jura" style="font-size: 20px; letter-spacing: 2px; margin-bottom: 15px;">CONTROL PANEL</h2>
+            <h2 class="font-jura" style="font-size: 22px; letter-spacing: 2px; margin-bottom: 20px; text-align:center; color:#fff;">CONTROL PANEL</h2>
 
-            <button class="btn-glass" onclick="alert('Membuka Panduan')"><span class="icon">📖</span> <span style="pointer-events:none;">Buku Panduan</span></button>
-            <button class="btn-glass" onclick="alert('Seting Daging')"><span class="icon">🥩</span> <span style="pointer-events:none;">Pengeringan Daging</span> <span class="icon" style="margin-left:auto; font-size: 16px;">🍎</span></button>
-            <button class="btn-glass" onclick="alert('Seting Sayur')"><span class="icon">🥬</span> <span style="pointer-events:none;">Pengeringan Sayur</span> <span class="icon" style="margin-left:auto; font-size: 16px;">🌿</span></button>
+            <button class="btn-glass" onclick="alert('Membuka Buku Panduan PDF/Teks')">
+                <span class="icon">📖</span> <span style="pointer-events:none;">Buku Panduan</span>
+            </button>
+            
+            <button class="btn-glass" onclick="alert('Mengatur Suhu ke Mode Daging')">
+                <span class="icon">🥩</span> <span style="pointer-events:none;">Pengeringan Daging</span> <span class="icon-right">🌡️</span>
+            </button>
+            
+            <button class="btn-glass" onclick="alert('Mengatur Suhu ke Mode Sayur')">
+                <span class="icon">🥬</span> <span style="pointer-events:none;">Pengeringan Sayur</span> <span class="icon-right">🌿</span>
+            </button>
 
             <div class="dashboard-widget">
                 <div class="widget-kiri">
-                    <div style="font-size: 10px; color: #888;">SUHU (°C)</div>
-                    <div style="height: 60px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items:flex-end;">
-                        <svg width="100%" height="40" viewBox="0 0 100 40" preserveAspectRatio="none">
-                            <path d="M0,30 Q20,10 40,25 T80,10 T100,20" fill="none" stroke="#00e5ff" stroke-width="2"/>
-                            <path d="M0,35 Q20,15 40,30 T80,15 T100,25" fill="none" stroke="#ff00cc" stroke-width="2"/>
+                    <div style="font-size: 10px; color: #888; font-weight:bold; letter-spacing:1px;">MONITOR SUHU (°C)</div>
+                    <div style="height: 40px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items:flex-end; padding-bottom:5px;">
+                        <svg width="100%" height="30" viewBox="0 0 100 30" preserveAspectRatio="none">
+                            <path d="M0,20 Q20,5 40,15 T80,5 T100,10" fill="none" stroke="#00e5ff" stroke-width="2"/>
+                            <path d="M0,25 Q20,10 40,20 T80,10 T100,15" fill="none" stroke="#ff00cc" stroke-width="2"/>
                         </svg>
                     </div>
                     <div class="mini-stat-grid">
-                        <div class="mini-stat" style="color: #00ff66;">R1-71°</div><div class="mini-stat" style="color: #00e5ff;">R2-73°</div>
-                        <div class="mini-stat" style="color: #ffcc00;">R3-75°</div><div class="mini-stat" style="color: #cc00ff;">R4-72°</div>
+                        <div class="mini-stat font-orbitron" style="color: #00ff66;">R1 <span id="dash-r1">--</span>°</div>
+                        <div class="mini-stat font-orbitron" style="color: #00e5ff;">R2 <span id="dash-r2">--</span>°</div>
+                        <div class="mini-stat font-orbitron" style="color: #ffcc00;">R3 <span id="dash-r3">--</span>°</div>
+                        <div class="mini-stat font-orbitron" style="color: #cc00ff;">R4 <span id="dash-r4">--</span>°</div>
                     </div>
                 </div>
                 <div class="widget-kanan">
-                    <div style="font-size: 40px; margin-bottom: 10px;">🧊</div>
-                    <div style="font-size: 9px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px; margin-bottom: 4px;">Rata Kabin: <span style="color:#fff">72°C</span></div>
-                    <div style="font-size: 9px; background: rgba(0,0,0,0.5); padding: 4px 8px; border-radius: 10px; color: #ff4d4d;">Pemanas: <span style="color:#fff">99°C</span></div>
+                    <div style="font-size: 35px; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(0,229,255,0.5));">❄️</div>
+                    <div style="font-size: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 10px; margin-bottom: 6px; width:100%; text-align:center;">
+                        Rata Kabin: <span style="color:#00e5ff; font-weight:bold;" class="font-orbitron">72°C</span>
+                    </div>
+                    <div style="font-size: 10px; background: rgba(255,42,85,0.2); padding: 5px 10px; border-radius: 10px; width:100%; text-align:center;">
+                        Pemanas: <span style="color:#ff2a55; font-weight:bold;" class="font-orbitron">99°C</span>
+                    </div>
                 </div>
             </div>
 
-            <div style="font-size: 12px; color: #888; margin-bottom: 10px; letter-spacing: 1px;">RAK PEMANTAUAN</div>
-            <button class="btn-glass" style="border-color: rgba(0,229,255,0.3); justify-content:center;" onclick="pindah('grafik')">
-                <span style="color: #00e5ff;
+            <div style="font-size: 12px; color: #888; margin-bottom: 10px; letter-spacing: 1px; text-align:center; font-weight:bold;">AKSES GRAFIK REAL-TIME</div>
+            
+            <button class="btn-glass font-orbitron" style="border-color: rgba(0,229,255,0.4); justify-content:center; background: rgba(0,229,255,0.05); box-shadow: 0 0 15px rgba(0,229,255,0.1);" onclick="pindah('grafik')">
+                <span style="color: #00e5ff; letter-spacing: 2px; pointer-events:none;">BUKA DETAIL RAK 📊</span>
+            </button>
+
+            <button class="btn-glass btn-shutdown" onclick="pindah('layar-mati')">
+                <span class="icon">⏻</span> <span style="pointer-events:none;">SHUT DOWN SYSTEM</span>
+            </button>
+
+            <div class="watermark font-orbitron">POWERED BY DAZA STORE</div>
+        </div>
+    </div>
+
+    <div id="grafik" class="page">
+        <div class="glass-panel" style="padding: 15px; max-width: 500px;">
+            <div class="status-bar font-orbitron" style="margin-bottom: 15px; cursor: pointer; border-color: rgba(0,229,255,0.3);" onclick="pindah('menu')">
+                <div style="color: #00e5ff;"><span style="font-size: 14px; margin-right: 5px;">❮</span> KEMBALI KE MENU</div>
+                <div class="synced"><span class="pulse"></span> SYNCED</div>
+            </div>
+
+            <h2 class="font-jura" style="font-size: 16px; letter-spacing: 1px; text-align: center; color: #fff; margin-bottom: 5px;">PEMANTAUAN SUHU (8 RAK)</h2>
+            <div style="text-align: center; font-size: 10px; color: #888; margin-bottom: 15px;">Real-time Data Logger</div>
+
+            <div class="grid-grafik">
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00ff66">Rak 1: <span id="val-rak1">--</span>°C</div><div class="canvas-container"><canvas id="c1"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00e5ff">Rak 2: <span id="val-rak2">--</span>°C</div><div class="canvas-container"><canvas id="c2"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffcc00">Rak 3: <span id="val-rak3">--</span>°C</div><div class="canvas-container"><canvas id="c3"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#cc00ff">Rak 4: <span id="val-rak4">--</span>°C</div><div class="canvas-container"><canvas id="c4"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff00cc">Rak 5: <span id="val-rak5">--</span>°C</div><div class="canvas-container"><canvas id="c5"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff3333">Rak 6: <span id="val-rak6">--</span>°C</div><div class="canvas-container"><canvas id="c6"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#3399ff">Rak 7: <span id="val-rak7">--</span>°C</div><div class="canvas-container"><canvas id="c7"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+                <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffffff">Rak 8: <span id="val-rak8">--</span>°C</div><div class="canvas-container"><canvas id="c8"></canvas></div><div class="label-bawah">WAKTU (Menit)</div></div>
+            </div>
+            
+            <div class="watermark font-orbitron">POWERED BY DAZA STORE</div>
+        </div>
+    </div>
+
+    <div id="layar-mati" class="page">
+        <button style="background:none; border:2px solid #333; color:#555; width:100px; height:100px; border-radius:50%; font-size:40px; cursor:pointer; transition: 0.3s;" onmouseover="this.style.borderColor='#00e5ff'; this.style.color='#00e5ff';" onmouseout="this.style.borderColor='#333'; this.style.color='#555';" onclick="pindah('welcome')">⏻</button>
+        <p class="font-orbitron" style="color: #555; margin-top: 20px; letter-spacing: 3px;">SYSTEM OFFLINE</p>
+        <p style="color: #333; font-size:10px; margin-top:10px;">Tap icon to wake</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        let sistemJalan = false;
+        const colors = ['#00ff66', '#00e5ff', '#ffcc00', '#cc00ff', '#ff00cc', '#ff3333', '#3399ff', '#ffffff'];
+
+        function jalankanSistemData() {
+            if(sistemJalan) return; 
+            sistemJalan = true;
+
+            try {
+                // Inisialisasi Firebase
+                firebase.initializeApp({
+                    apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
+                    databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
+                });
+                const db = firebase.database();
+
+                // Setup Chart.js
+                Chart.defaults.color = 'rgba(255,255,255,0.3)';
+                Chart.defaults.font.size = 8;
+                
+                let chartInstances = [];
+                for(let i=1; i<=8; i++) {
+                    const ctx = document.getElementById(`c${i}`).getContext('2d');
+                    
+                    let gradient = ctx.createLinearGradient(0, 0, 0, 80);
+                    gradient.addColorStop(0, colors[i-1] + '80'); 
+                    gradient.addColorStop(1, colors[i-1] + '00'); 
+
+                    chartInstances.push(new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: [], datasets: [{ 
+                            data: [], borderColor: colors[i-1], backgroundColor: gradient,
+                            borderWidth: 2, pointRadius: 0, tension: 0.4, fill: true
+                        }] },
+                        options: { 
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: { legend: { display: false } },
+                            scales: { 
+                                x: { display: false }, 
+                                y: { min: 0, max: 80, border: {dash: [2,4]}, grid: { color: 'rgba(255,255,255,0.05)' } } 
+                            },
+                            animation: false 
+                        }
+                    }));
+                }
+
+                // Tarik Data Realtime
+                db.ref('monitoring').on('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if(data) {
+                        for(let i=1; i<=8; i++) {
+                            let suhu = data[`rak${i}`];
+                            if(suhu !== undefined) {
+                                // Update text di Layar Grafik
+                                document.getElementById(`val-rak${i}`).innerText = suhu;
+                                
+                                // Update text mini-dashboard di Layar Menu (kalau ada)
+                                let dashText = document.getElementById(`dash-r${i}`);
+                                if(dashText) dashText.innerText = suhu;
+
+                                // Update Grafik
+                                let c = chartInstances[i-1];
+                                if(c.data.labels.length > 15) { c.data.labels.shift(); c.data.datasets[0].data.shift(); }
+                                c.data.labels.push('');
+                                c.data.datasets[0].data.push(suhu);
+                                c.update();
+                            }
+                        }
+                    }
+                });
+            } catch(e) {
+                console.error("Gagal menjalankan data:", e);
+            }
+        }
+    </script>
+</body>
+</html>
