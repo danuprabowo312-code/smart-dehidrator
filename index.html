@@ -133,9 +133,10 @@
             <div class="synced"><span class="pulse"></span> READY</div>
         </div>
 
-        <button class="btn-menu" onclick="window.open('panduan.pdf', '_blank')">
+        <button class="btn-menu" onclick="window.open('standarpangan.pdf', '_blank')">
             <span style="font-size: 24px;">📓</span> <span class="btn-text">Buku Panduan Digital</span>
         </button>
+        
         <button class="btn-menu" onclick="alert('Mode Daging Aktif')">
             <span style="font-size: 24px;">🥩</span> <span class="btn-text">Pengeringan Daging</span>
         </button>
@@ -208,14 +209,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        // FUNGSI NAVIGASI
         function navigasi(id) {
             document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
             document.getElementById(id).classList.add('active');
             window.scrollTo(0, 0);
         }
 
-        // SETUP GRAFIK & FIREBASE
         window.onload = function() {
             setTimeout(inisialisasi, 1000);
         };
@@ -227,7 +226,6 @@
 
         function inisialisasi() {
             try {
-                // Konfigurasi Chart
                 Chart.defaults.color = 'rgba(255,255,255,0.3)';
                 Chart.defaults.font.size = 8;
                 const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0, max: 100, ticks: { stepSize: 50 } } }, elements: { point: { radius: 0 }, line: { tension: 0.4 } } };
@@ -238,7 +236,6 @@
                     charts.push(new Chart(document.getElementById('c'+i).getContext('2d'), { type: 'line', data: { labels: ['','','',''], datasets: [{ data: [0,0,0,0], borderColor: colors[i-1], borderWidth: 1.5 }] }, options: opt }));
                 }
 
-                // Konek Firebase
                 if (!firebase.apps.length) {
                     firebase.initializeApp({
                         apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
@@ -268,7 +265,6 @@
                     mainChart.data.datasets[0].data = history.avg;
                     mainChart.update('none');
                 });
-
             } catch(e) { console.error("System ready in offline mode."); }
         }
     </script>
