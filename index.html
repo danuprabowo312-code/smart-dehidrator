@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>D-Hydrate Pro Max</title>
+    <title>D-Hydrate Pro Max Ultimate</title>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=SF+Pro+Display:wght@400;600&display=swap');
@@ -18,97 +18,94 @@
             z-index: -10; pointer-events: none;
         }
 
-        /* CSS HALAMAN - ANTI NYANGKUT */
+        /* LAYOUT HALAMAN */
         .page-container {
             position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh;
             padding: 20px; padding-bottom: 50px;
             opacity: 0; pointer-events: none; z-index: -100; visibility: hidden;
-            transition: opacity 0.3s ease-in-out;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; flex-direction: column; align-items: center;
         }
         
         .page-container.active {
             opacity: 1; pointer-events: auto; z-index: 10; visibility: visible;
+            transform: scale(1);
         }
 
         #welcome, #layar-mati { justify-content: center; text-align: center; }
 
         .font-orbitron { font-family: 'Orbitron', sans-serif; }
         
-        /* EFEK JUDUL WELCOME SCREEN */
-        .title-glow { font-size: 36px; color: #fff; text-shadow: 0 0 20px rgba(0, 229, 255, 0.9), 0 0 10px rgba(0, 229, 255, 0.5); margin-top: 15px; letter-spacing: 3px; font-weight: 900;}
+        /* TAMPILAN DEPAN (INITIALIZE) */
+        .welcome-title { font-size: 42px; color: #fff; text-shadow: 0 0 20px #00e5ff; margin-bottom: 5px; font-weight: 900; letter-spacing: 4px;}
         
-        /* FRAME GAMBAR DEHIDRATOR */
-        .mesin-frame {
+        .frame-mesin {
             position: relative;
-            width: 180px; height: 180px;
-            border-radius: 20px;
-            padding: 5px;
-            background: linear-gradient(135deg, rgba(0,229,255,0.5), rgba(0,0,0,0));
-            box-shadow: 0 0 40px rgba(0, 229, 255, 0.4), inset 0 0 20px rgba(0, 229, 255, 0.2);
-            margin-bottom: 25px;
-            display: flex; justify-content: center; align-items: center;
-            animation: float 3s ease-in-out infinite;
+            width: 280px; height: 280px;
+            border: 2px solid rgba(0, 229, 255, 0.3);
+            border-radius: 30px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 0 50px rgba(0, 229, 255, 0.2);
+            margin-bottom: 30px;
+            animation: float 4s ease-in-out infinite;
         }
-        .mesin-frame img {
-            width: 100%; height: 100%; object-fit: cover; border-radius: 15px;
-            background-color: #0a1423;
-        }
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 5px;
-            background: rgba(0, 229, 255, 0.8); box-shadow: 0 0 15px #00e5ff;
-            border-radius: 10px; opacity: 0.7; animation: scan 2.5s infinite linear;
-        }
+        .frame-mesin img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
         
-        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
-        @keyframes scan { 0% { top: 0; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { top: 100%; opacity: 0; } }
-
-        /* BUTTON INITIALIZE KEREN */
-        .btn-init {
-            background: rgba(0, 229, 255, 0.1); border: 2px solid #00e5ff;
-            box-shadow: 0 0 15px rgba(0, 229, 255, 0.4), inset 0 0 10px rgba(0, 229, 255, 0.2);
-            color: #00e5ff; width: 100%; max-width: 280px; padding: 18px 20px; margin-top: 30px;
-            font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 12px;
-            transition: all 0.3s; letter-spacing: 2px;
+        .laser-scan {
+            position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: #00e5ff; box-shadow: 0 0 20px #00e5ff, 0 0 40px #00e5ff;
+            z-index: 5; animation: scanning 3s infinite linear;
         }
-        .btn-init:hover, .btn-init:active { background: #00e5ff; color: #000; box-shadow: 0 0 30px #00e5ff; transform: scale(1.05); }
 
+        .btn-masuk {
+            background: linear-gradient(135deg, #00e5ff 0%, #008cff 100%);
+            border: none; border-radius: 15px; color: #000;
+            width: 100%; max-width: 300px; padding: 20px;
+            font-size: 20px; font-weight: 900; cursor: pointer;
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.5);
+            transition: 0.3s; letter-spacing: 2px;
+        }
+        .btn-masuk:hover { transform: scale(1.05); box-shadow: 0 0 50px #00e5ff; }
+        .btn-masuk:active { transform: scale(0.95); }
+
+        /* DASHBOARD COMPONENTS */
         .status-bar {
             display: flex; justify-content: space-between; align-items: center;
-            background: rgba(10, 20, 35, 0.6); border-radius: 20px; padding: 12px 20px; 
+            background: rgba(10, 20, 35, 0.8); border-radius: 20px; padding: 12px 20px; 
             border: 1px solid rgba(0, 229, 255, 0.2); width: 100%; max-width: 450px; margin-bottom: 20px;
-            font-size: 11px; color: #8e9bb0; letter-spacing: 1px;
+            font-size: 11px; color: #8e9bb0;
         }
         .synced { color: #00ff66; display: flex; align-items: center; font-weight: bold;}
         .pulse { width: 8px; height: 8px; background: #00ff66; border-radius: 50%; display: inline-block; margin-right: 8px; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
         .btn-menu {
-            background: linear-gradient(90deg, rgba(20,30,50,0.8) 0%, rgba(10,15,25,0.9) 100%);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; color: #fff; 
-            width: 100%; max-width: 450px; padding: 16px 20px; margin-bottom: 12px; 
-            font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; 
-            cursor: pointer; transition: 0.2s; position: relative; z-index: 20;
+            background: linear-gradient(90deg, rgba(20,30,50,0.9) 0%, rgba(10,15,25,1) 100%);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 18px; color: #fff; 
+            width: 100%; max-width: 450px; padding: 18px 25px; margin-bottom: 12px; 
+            font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 15px; 
+            cursor: pointer; transition: 0.2s;
         }
-        .btn-menu:active { transform: scale(0.95); border-color: #00e5ff; }
-        .icon-box, .btn-text { pointer-events: none; } 
+        .btn-menu:active { transform: scale(0.98); border-color: #00e5ff; }
 
-        .btn-shutdown { background: rgba(20, 5, 10, 0.8); border: 1px solid rgba(255, 42, 85, 0.4); color: #ff2a55; justify-content: center; margin-top: 15px; font-weight: bold;}
-
-        .dashboard-panel {
-            background: rgba(15, 25, 40, 0.5); border: 1px solid rgba(0,229,255,0.2); border-radius: 20px; padding: 15px; width: 100%; max-width: 450px; margin-bottom: 20px; cursor: pointer;
+        .dashboard-card {
+            background: rgba(15, 25, 40, 0.6); border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 25px; padding: 20px; width: 100%; max-width: 450px;
+            margin-bottom: 20px; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
-        .dash-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;}
-        .chart-box-main { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); height: 160px;}
-        .dehydrator-box { background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px;}
 
-        .mini-rak-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px;}
-        .mini-rak { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 5px; text-align: center; font-size: 9px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 45px;}
+        .mini-rak-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 15px; }
+        .mini-rak { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 8px; text-align: center; font-size: 10px; display: flex; flex-direction: column; justify-content: center; height: 50px;}
 
         .grid-grafik-8 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 450px;}
-        .card-grafik { background: rgba(15, 25, 40, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; height: 130px; position: relative;}
-        .header-rak { text-align: center; font-size: 14px; margin-bottom: 5px; font-weight: bold;}
-        .canvas-container { position: relative; height: 75px; width: 100%; }
+        .card-grafik { background: rgba(15, 25, 40, 0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; padding: 15px; height: 140px; position: relative;}
+        
+        .btn-danger { background: rgba(255, 42, 85, 0.1); border: 1px solid #ff2a55; color: #ff2a55; justify-content: center; margin-top: 20px; font-weight: bold;}
+
+        /* ANIMASI */
+        @keyframes scanning { 0% { top: 0; } 100% { top: 100%; } }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
     </style>
 </head>
 <body>
@@ -116,53 +113,57 @@
     <div class="bg-glow"></div>
 
     <div id="welcome" class="page-container active">
+        <h1 class="welcome-title font-orbitron">D-HYDRATE</h1>
+        <p class="font-orbitron" style="font-size: 10px; color: #00e5ff; letter-spacing: 5px; margin-bottom: 30px;">PRO EDITION V3.0</p>
         
-        <div class="mesin-frame">
-            <div class="scan-line"></div>
-            <img src="mesin.jpg" alt="Dehydrator" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2300e5ff\'><path d=\'M4 4h16v16H4V4zm2 2v12h12V6H6zm2 2h8v2H8V8zm0 4h8v2H8v-2zm0 4h5v2H8v-2z\'/></svg>';">
+        <div class="frame-mesin">
+            <div class="laser-scan"></div>
+            <img src="mesin.jpg" alt="Smart Dehydrator">
         </div>
         
-        <h1 class="title-glow font-orbitron">D-HYDRATE</h1>
-        <div class="font-orbitron" style="font-size: 11px; color: #8e9bb0; letter-spacing: 6px; margin-bottom: 20px; font-weight: bold;">PRO EDITION V3.0</div>
-        
-        <button class="btn-init font-orbitron" onclick="navigasi('menu')">
-            INITIALIZE SYSTEM
+        <button class="btn-masuk font-orbitron" onclick="navigasi('menu')">
+            MASUKKK BOSSS
         </button>
+        <p style="margin-top: 20px; font-size: 10px; color: #555;">SYSTEM STATUS: ENCRYPTED & SECURE</p>
     </div>
 
     <div id="menu" class="page-container">
         <div class="status-bar font-orbitron">
-            <div id="status-koneksi">TERMINAL: STANDBY</div>
+            <div>TERMINAL: ONLINE</div>
             <div class="synced"><span class="pulse"></span> READY</div>
         </div>
 
-        <h2 class="font-orbitron" style="font-size: 18px; letter-spacing: 2px; margin-bottom: 20px;">CONTROL PANEL</h2>
-
         <button class="btn-menu" onclick="window.open('panduan.pdf', '_blank')">
-            <span class="icon-box">📓</span> <span class="btn-text">Buku Panduan</span>
+            <span style="font-size: 24px;">📓</span> <span class="btn-text">Buku Panduan Digital</span>
         </button>
-        <button class="btn-menu" onclick="alert('Pengaturan Daging Disimpan')">
-            <span class="icon-box">🥩</span> <span class="btn-text">Pengeringan Daging</span>
+        <button class="btn-menu" onclick="alert('Mode Daging Aktif')">
+            <span style="font-size: 24px;">🥩</span> <span class="btn-text">Pengeringan Daging</span>
         </button>
-        <button class="btn-menu" onclick="alert('Pengaturan Sayur Disimpan')">
-            <span class="icon-box">🥬</span> <span class="btn-text">Pengeringan Sayur</span>
+        <button class="btn-menu" onclick="alert('Mode Sayur Aktif')">
+            <span style="font-size: 24px;">🥬</span> <span class="btn-text">Pengeringan Sayur</span>
         </button>
-        <button class="btn-menu" onclick="alert('Pengaturan Buah Disimpan')" style="margin-bottom: 20px;">
-            <span class="icon-box">🍎</span> <span class="btn-text">Pengeringan Buah</span>
+        <button class="btn-menu" onclick="alert('Mode Buah Aktif')" style="margin-bottom: 20px;">
+            <span style="font-size: 24px;">🍎</span> <span class="btn-text">Pengeringan Buah</span>
         </button>
 
-        <div class="dashboard-panel" onclick="navigasi('grafik')">
-            <div class="dash-grid-top">
-                <div class="chart-box-main">
-                    <div style="font-size: 8px; color: #888; margin-bottom: 5px;">SUHU RATA-RATA</div>
-                    <div class="canvas-container" style="height: 110px;"><canvas id="main-chart"></canvas></div>
+        <div class="dashboard-card" onclick="navigasi('grafik')">
+            <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 15px;">
+                <div style="background: rgba(0,0,0,0.4); border-radius: 15px; padding: 10px; height: 160px;">
+                    <p style="font-size: 9px; color: #888; margin-bottom: 5px;">LIVE AVG TEMP (°C)</p>
+                    <div style="height: 120px;"><canvas id="main-chart"></canvas></div>
                 </div>
-                <div class="dehydrator-box">
-                    <div style="width: 100%; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 10px; font-size: 10px; text-align: center; margin-bottom: 10px;">
-                        Rata-rata Kabin:<br><span id="val-rata" class="font-orbitron" style="color:#00e5ff; font-weight:bold; font-size: 16px;">0°C</span>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="background: rgba(0,229,255,0.1); border: 1px solid #00e5ff; border-radius: 12px; padding: 12px; text-align: center;">
+                        <p style="font-size: 8px;">KABIN</p>
+                        <h2 id="val-rata" class="font-orbitron" style="color:#00e5ff;">0°C</h2>
+                    </div>
+                    <div style="background: rgba(255,42,85,0.1); border: 1px solid #ff2a55; border-radius: 12px; padding: 12px; text-align: center;">
+                        <p style="font-size: 8px;">HEATER</p>
+                        <h2 class="font-orbitron" style="color:#ff2a55;">99°C</h2>
                     </div>
                 </div>
             </div>
+
             <div class="mini-rak-grid font-orbitron">
                 <div class="mini-rak"><span style="color:#00ff66; font-size:7px;">Rak 1</span><span id="mr1">0°</span></div>
                 <div class="mini-rak"><span style="color:#00e5ff; font-size:7px;">Rak 2</span><span id="mr2">0°</span></div>
@@ -173,94 +174,102 @@
                 <div class="mini-rak"><span style="color:#3399ff; font-size:7px;">Rak 7</span><span id="mr7">0°</span></div>
                 <div class="mini-rak"><span style="color:#ffffff; font-size:7px;">Rak 8</span><span id="mr8">0°</span></div>
             </div>
+            <p style="font-size: 9px; color: #555; text-align: center; margin-top: 15px;">TAP UNTUK ANALISA DETAIL RAK</p>
         </div>
 
-        <button class="btn-menu btn-shutdown font-orbitron" onclick="navigasi('layar-mati')">
-            <span class="btn-text">⏻ SHUT DOWN</span>
-        </button>
+        <button class="btn-menu btn-danger font-orbitron" onclick="navigasi('layar-mati')">⏻ SHUT DOWN</button>
     </div>
 
     <div id="grafik" class="page-container">
         <div class="status-bar font-orbitron" style="cursor: pointer;" onclick="navigasi('menu')">
-            <div style="color: #fff; display:flex; align-items:center; gap:5px;"><span style="font-size:14px;">❮</span> KEMBALI</div>
+            <div style="color: #fff;">❮ KEMBALI</div>
+            <div style="color: #00e5ff;">RAK ANALYTICS</div>
         </div>
 
-        <h2 class="font-orbitron" style="font-size: 14px; text-align: center; margin-bottom: 15px;">DETAIL PEMANTAUAN RAK</h2>
-
         <div class="grid-grafik-8">
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00ff66">Rak 1: <span id="val-rak1">0</span>°</div><div class="canvas-container"><canvas id="c1"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00e5ff">Rak 2: <span id="val-rak2">0</span>°</div><div class="canvas-container"><canvas id="c2"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffcc00">Rak 3: <span id="val-rak3">0</span>°</div><div class="canvas-container"><canvas id="c3"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#cc00ff">Rak 4: <span id="val-rak4">0</span>°</div><div class="canvas-container"><canvas id="c4"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff00cc">Rak 5: <span id="val-rak5">0</span>°</div><div class="canvas-container"><canvas id="c5"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff3333">Rak 6: <span id="val-rak6">0</span>°</div><div class="canvas-container"><canvas id="c6"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#3399ff">Rak 7: <span id="val-rak7">0</span>°</div><div class="canvas-container"><canvas id="c7"></canvas></div></div>
-            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffffff">Rak 8: <span id="val-rak8">0</span>°</div><div class="canvas-container"><canvas id="c8"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#00ff66; font-size:12px;">RAK 1: <span id="val-rak1">0</span>°</p><div style="height:90px;"><canvas id="c1"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#00e5ff; font-size:12px;">RAK 2: <span id="val-rak2">0</span>°</p><div style="height:90px;"><canvas id="c2"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#ffcc00; font-size:12px;">RAK 3: <span id="val-rak3">0</span>°</p><div style="height:90px;"><canvas id="c3"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#cc00ff; font-size:12px;">RAK 4: <span id="val-rak4">0</span>°</p><div style="height:90px;"><canvas id="c4"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#ff00cc; font-size:12px;">RAK 5: <span id="val-rak5">0</span>°</p><div style="height:90px;"><canvas id="c5"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#ff3333; font-size:12px;">RAK 6: <span id="val-rak6">0</span>°</p><div style="height:90px;"><canvas id="c6"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#3399ff; font-size:12px;">RAK 7: <span id="val-rak7">0</span>°</p><div style="height:90px;"><canvas id="c7"></canvas></div></div>
+            <div class="card-grafik"><p class="font-orbitron" style="color:#ffffff; font-size:12px;">RAK 8: <span id="val-rak8">0</span>°</p><div style="height:90px;"><canvas id="c8"></canvas></div></div>
         </div>
     </div>
 
     <div id="layar-mati" class="page-container">
-        <button style="background:none; border:2px solid #333; color:#555; width:100px; height:100px; border-radius:50%; font-size:40px; cursor:pointer; margin-top: 30vh;" onclick="navigasi('welcome')">⏻</button>
-        <p class="font-orbitron" style="color: #555; margin-top: 20px;">SYSTEM OFFLINE</p>
+        <button style="background:none; border:2px solid #333; color:#555; width:120px; height:120px; border-radius:50%; font-size:50px; cursor:pointer;" onclick="navigasi('welcome')">⏻</button>
+        <p class="font-orbitron" style="color: #333; margin-top: 30px; letter-spacing: 5px;">SYSTEM OFFLINE</p>
     </div>
-
-    <script>
-        function navigasi(id) {
-            var pages = document.getElementsByClassName('page-container');
-            for(var i = 0; i < pages.length; i++) {
-                pages[i].classList.remove('active');
-            }
-            document.getElementById(id).classList.add('active');
-            window.scrollTo(0, 0);
-        }
-    </script>
 
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
-        window.addEventListener('load', function() {
-            setTimeout(mulaiGrafikDanFirebase, 1000); 
-        });
+        // FUNGSI NAVIGASI
+        function navigasi(id) {
+            document.querySelectorAll('.page-container').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0, 0);
+        }
 
-        function mulaiGrafikDanFirebase() {
+        // SETUP GRAFIK & FIREBASE
+        window.onload = function() {
+            setTimeout(inisialisasi, 1000);
+        };
+
+        let charts = [];
+        let mainChart;
+        let history = { avg: [], racks: [[],[],[],[],[],[],[],[]] };
+        const colors = ['#00ff66', '#00e5ff', '#ffcc00', '#cc00ff', '#ff00cc', '#ff3333', '#3399ff', '#ffffff'];
+
+        function inisialisasi() {
             try {
-                // 1. Setup Grafik
-                Chart.defaults.color = 'rgba(255,255,255,0.4)';
-                var opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0, max: 100 } }, elements: { point: { radius: 0 } } };
-                
-                var cMain = new Chart(document.getElementById('main-chart'), { type: 'line', data: { labels: ['','','','',''], datasets: [{ data: [0,0,0,0,0], borderColor: '#ff2a55', tension: 0.4 }] }, options: opt });
-                var charts = [];
-                var colors = ['#00ff66', '#00e5ff', '#ffcc00', '#cc00ff', '#ff00cc', '#ff3333', '#3399ff', '#ffffff'];
-                for (var i = 1; i <= 8; i++) {
-                    charts.push(new Chart(document.getElementById('c'+i), { type: 'line', data: { labels: ['','','','',''], datasets: [{ data: [0,0,0,0,0], borderColor: colors[i-1], tension: 0.4 }] }, options: opt }));
+                // Konfigurasi Chart
+                Chart.defaults.color = 'rgba(255,255,255,0.3)';
+                Chart.defaults.font.size = 8;
+                const opt = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { min: 0, max: 100, ticks: { stepSize: 50 } } }, elements: { point: { radius: 0 }, line: { tension: 0.4 } } };
+
+                mainChart = new Chart(document.getElementById('main-chart').getContext('2d'), { type: 'line', data: { labels: ['','','','','','','','','',''], datasets: [{ data: [0,0,0,0,0,0,0,0,0,0], borderColor: '#00e5ff', borderWidth: 2, fill: true, backgroundColor: 'rgba(0,229,255,0.1)' }] }, options: opt });
+
+                for(let i=1; i<=8; i++) {
+                    charts.push(new Chart(document.getElementById('c'+i).getContext('2d'), { type: 'line', data: { labels: ['','','',''], datasets: [{ data: [0,0,0,0], borderColor: colors[i-1], borderWidth: 1.5 }] }, options: opt }));
                 }
 
-                // 2. Setup Firebase
+                // Konek Firebase
                 if (!firebase.apps.length) {
                     firebase.initializeApp({
                         apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
                         databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
                     });
                 }
-                document.getElementById('status-koneksi').innerText = "TERMINAL: ONLINE";
-                
-                firebase.database().ref('Sensor').on('value', function(snapshot) {
-                    var data = snapshot.val();
+
+                firebase.database().ref('Sensor').on('value', snap => {
+                    const data = snap.val();
                     if(!data) return;
-                    var total = 0;
-                    for(var j = 1; j <= 8; j++) {
-                        var suhu = data['Rak'+j] || 0;
-                        total += suhu;
-                        document.getElementById('val-rak'+j).innerText = suhu;
-                        document.getElementById('mr'+j).innerText = suhu + '°';
+                    let total = 0;
+                    for(let j=1; j<=8; j++) {
+                        let val = data['Rak'+j] || 0;
+                        total += val;
+                        document.getElementById('val-rak'+j).innerText = val;
+                        document.getElementById('mr'+j).innerText = val + '°';
+                        
+                        history.racks[j-1].push(val);
+                        if(history.racks[j-1].length > 10) history.racks[j-1].shift();
+                        charts[j-1].data.datasets[0].data = history.racks[j-1];
+                        charts[j-1].update('none');
                     }
-                    document.getElementById('val-rata').innerText = (total/8).toFixed(1) + '°C';
+                    let rata = (total/8).toFixed(1);
+                    document.getElementById('val-rata').innerText = rata + '°C';
+                    history.avg.push(rata);
+                    if(history.avg.length > 15) history.avg.shift();
+                    mainChart.data.datasets[0].data = history.avg;
+                    mainChart.update('none');
                 });
-            } catch(e) {
-                console.log("Sistem berjalan offline, tombol tetap aman.");
-            }
+
+            } catch(e) { console.error("System ready in offline mode."); }
         }
     </script>
 </body>
