@@ -2,11 +2,11 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>D-Hydrate Pro Max Ultimate</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>D-Hydrate Pro Max</title>
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Jura:wght@500;700&family=SF+Pro+Display:wght@400;600&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=SF+Pro+Display:wght@400;600&display=swap');
 
         /* RESET & GLOBAL */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; margin: 0; padding: 0; }
@@ -22,21 +22,18 @@
             z-index: -10; pointer-events: none;
         }
 
-        /* TUMPANG TINDIH HALAMAN (SOLUSI TOMBOL NYANGKUT & BLANK HITAM) */
+        /* TUMPANG TINDIH HALAMAN - DIJAMIN TIDAK BLANK */
         .page-container {
             position: absolute; top: 0; left: 0; width: 100%; min-height: 100vh;
             padding: 20px; padding-bottom: 50px;
-            
-            /* KUNCI UTAMA: pointer-events: none mematikan sentuhan pada layar gaib */
             opacity: 0; pointer-events: none; z-index: -1; transform: scale(0.98);
             transition: all 0.3s ease-in-out;
-            
             display: flex; flex-direction: column; align-items: center;
         }
         
-        /* Layar aktif bisa disentuh dan ada di paling depan */
+        /* Halaman yang sedang aktif */
         .page-container.active {
-            opacity: 1; pointer-events: auto; z-index: 10; transform: scale(1);
+            opacity: 1 !important; pointer-events: auto !important; z-index: 10 !important; transform: scale(1) !important;
         }
 
         #welcome, #layar-mati { justify-content: center; text-align: center; }
@@ -63,11 +60,187 @@
             width: 100%; max-width: 450px; padding: 16px 20px; margin-bottom: 12px; 
             font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; 
             cursor: pointer; box-shadow: 0 8px 20px rgba(0,0,0,0.4); transition: 0.2s;
-            position: relative; overflow: hidden;
         }
         .btn-menu:active { transform: scale(0.95); border-color: #00e5ff; background: rgba(0,229,255,0.1); }
-        .icon-box { font-size: 26px; pointer-events: none; filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5)); }
-        .btn-text { pointer-events: none; } /* Mencegah klik nyangkut di teks */
+        .icon-box { font-size: 26px; pointer-events: none; }
+        .btn-text { pointer-events: none; } 
 
         .btn-shutdown {
-            background: rgba(20, 5, 10, 0.8); border: 1px solid rgba(255, 42, 85,
+            background: rgba(20, 5, 10, 0.8); border: 1px solid rgba(255, 42, 85, 0.4); 
+            color: #ff2a55; justify-content: center; margin-top: 15px; font-weight: bold;
+        }
+
+        /* WIDGET DASHBOARD MENU */
+        .dashboard-panel {
+            background: rgba(15, 25, 40, 0.5); border: 1px solid rgba(0,229,255,0.2);
+            border-radius: 20px; padding: 15px; width: 100%; max-width: 450px;
+            margin-bottom: 20px; cursor: pointer;
+        }
+        .dash-grid-top { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; pointer-events: none;}
+        .chart-box-main { background: rgba(0,0,0,0.4); border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.05); position: relative; height: 160px;}
+        .dehydrator-box { background: rgba(0,0,0,0.3); border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 10px;}
+
+        /* 8 RAK MINI INDICATORS */
+        .mini-rak-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; pointer-events: none;}
+        .mini-rak { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 5px; text-align: center; font-size: 9px; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 45px;}
+
+        /* GRID RAK GRAFIK (8 KOTAK) */
+        .grid-grafik-8 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: 100%; max-width: 450px;}
+        .card-grafik { background: rgba(15, 25, 40, 0.6); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; height: 130px; position: relative;}
+        .header-rak { text-align: center; font-size: 14px; margin-bottom: 5px; font-weight: bold;}
+        .label-bawah { position: absolute; bottom: 5px; width: 100%; text-align: center; font-size: 7px; color: #666; left: 0;}
+        .canvas-container { position: relative; height: 75px; width: 100%; }
+        
+        .info-text { text-align: center; font-size: 10px; color: #666; letter-spacing: 2px; margin: 15px 0;}
+    </style>
+</head>
+<body>
+
+    <div class="bg-glow"></div>
+
+    <div id="welcome" class="page-container active" style="opacity: 1; z-index: 999; display: flex;">
+        <div style="width: 130px; height: 130px; border-radius: 50%; border: 3px solid #00e5ff; display: flex; justify-content: center; align-items: center; margin-bottom: 20px; box-shadow: 0 0 30px rgba(0, 229, 255, 0.3);">
+            <div style="width: 100px; height: 100px; background: #000; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 50px;">🧊</div>
+        </div>
+        
+        <h1 class="title-glow font-orbitron">D-HYDRATE</h1>
+        <div class="font-orbitron" style="font-size: 10px; color: #00e5ff; letter-spacing: 5px; margin-bottom: 50px; font-weight: bold;">PRO EDITION V3.0</div>
+        
+        <button class="btn-menu font-orbitron" style="justify-content: center; border-color: #00e5ff; max-width: 250px;" onclick="navigasi('menu')">
+            <span class="btn-text" style="color:#00e5ff;">INITIALIZE SYSTEM</span>
+        </button>
+    </div>
+
+    <div id="menu" class="page-container">
+        <div class="status-bar font-orbitron">
+            <div id="status-koneksi">TERMINAL: OFFLINE (LOKAL)</div>
+            <div class="synced"><span class="pulse"></span> READY</div>
+        </div>
+
+        <h2 class="font-orbitron" style="font-size: 18px; letter-spacing: 2px; margin-bottom: 20px;">CONTROL PANEL</h2>
+
+        <button class="btn-menu" onclick="bukaBukuPanduan()">
+            <span class="icon-box">📓</span> <span class="btn-text">Buku Panduan</span>
+        </button>
+        <button class="btn-menu" onclick="alert('Pengaturan Daging Disimpan')">
+            <span class="icon-box">🥩</span> <span class="btn-text">Pengeringan Daging</span>
+        </button>
+        <button class="btn-menu" onclick="alert('Pengaturan Sayur Disimpan')" style="margin-bottom: 20px;">
+            <span class="icon-box">🥬</span> <span class="btn-text">Pengeringan Sayur</span>
+        </button>
+
+        <div class="dashboard-panel" onclick="navigasi('grafik')">
+            <div class="dash-grid-top">
+                <div class="chart-box-main">
+                    <div style="font-size: 8px; color: #888; margin-bottom: 5px;">SUHU RATA-RATA</div>
+                    <div class="canvas-container" style="height: 110px;">
+                        <canvas id="main-chart"></canvas>
+                    </div>
+                </div>
+
+                <div class="dehydrator-box">
+                    <div style="width: 100%; background: rgba(0,0,0,0.6); border-radius: 6px; padding: 10px; font-size: 10px; text-align: center; margin-bottom: 10px;">
+                        Rata-rata Kabin:<br>
+                        <span id="val-rata" class="font-orbitron" style="color:#00e5ff; font-weight:bold; font-size: 16px;">0°C</span>
+                    </div>
+                    <div style="width: 100%; background: rgba(255,0,0,0.1); border-radius: 6px; padding: 10px; font-size: 10px; text-align: center; border: 1px solid rgba(255,0,0,0.3);">
+                        Suhu Pemanas:<br>
+                        <span class="font-orbitron" style="color:#ff2a55; font-weight:bold; font-size: 16px;">0°C</span>
+                    </div>
+                </div>
+            </div>
+
+            <div style="font-size: 10px; color: #888; text-align: center; margin-top: 5px; pointer-events:none;">TAP KOTAK INI UNTUK GRAFIK DETAIL</div>
+            <div class="mini-rak-grid font-orbitron">
+                <div class="mini-rak"><span style="color:#00ff66; font-size:7px;">Rak 1</span><span id="mr1">0°</span></div>
+                <div class="mini-rak"><span style="color:#00e5ff; font-size:7px;">Rak 2</span><span id="mr2">0°</span></div>
+                <div class="mini-rak"><span style="color:#ffcc00; font-size:7px;">Rak 3</span><span id="mr3">0°</span></div>
+                <div class="mini-rak"><span style="color:#cc00ff; font-size:7px;">Rak 4</span><span id="mr4">0°</span></div>
+                <div class="mini-rak"><span style="color:#ff00cc; font-size:7px;">Rak 5</span><span id="mr5">0°</span></div>
+                <div class="mini-rak"><span style="color:#ff3333; font-size:7px;">Rak 6</span><span id="mr6">0°</span></div>
+                <div class="mini-rak"><span style="color:#3399ff; font-size:7px;">Rak 7</span><span id="mr7">0°</span></div>
+                <div class="mini-rak"><span style="color:#ffffff; font-size:7px;">Rak 8</span><span id="mr8">0°</span></div>
+            </div>
+        </div>
+
+        <button class="btn-menu btn-shutdown font-orbitron" onclick="navigasi('layar-mati')">
+            <span class="btn-text">⏻ SHUT DOWN</span>
+        </button>
+    </div>
+
+    <div id="grafik" class="page-container">
+        <div class="status-bar font-orbitron" style="cursor: pointer;" onclick="navigasi('menu')">
+            <div style="color: #fff; display:flex; align-items:center; gap:5px;"><span style="font-size:14px;">❮</span> KEMBALI</div>
+            <div class="synced"><span class="pulse"></span> SYNCED</div>
+        </div>
+
+        <h2 class="font-orbitron" style="font-size: 14px; letter-spacing: 1px; text-align: center; margin-bottom: 15px;">DETAIL PEMANTAUAN RAK</h2>
+
+        <div class="grid-grafik-8">
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00ff66">Rak 1: <span id="val-rak1">0</span>°</div><div class="canvas-container"><canvas id="c1"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#00e5ff">Rak 2: <span id="val-rak2">0</span>°</div><div class="canvas-container"><canvas id="c2"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffcc00">Rak 3: <span id="val-rak3">0</span>°</div><div class="canvas-container"><canvas id="c3"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#cc00ff">Rak 4: <span id="val-rak4">0</span>°</div><div class="canvas-container"><canvas id="c4"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff00cc">Rak 5: <span id="val-rak5">0</span>°</div><div class="canvas-container"><canvas id="c5"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ff3333">Rak 6: <span id="val-rak6">0</span>°</div><div class="canvas-container"><canvas id="c6"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#3399ff">Rak 7: <span id="val-rak7">0</span>°</div><div class="canvas-container"><canvas id="c7"></canvas></div></div>
+            <div class="card-grafik"><div class="header-rak font-orbitron" style="color:#ffffff">Rak 8: <span id="val-rak8">0</span>°</div><div class="canvas-container"><canvas id="c8"></canvas></div></div>
+        </div>
+    </div>
+
+    <div id="layar-mati" class="page-container">
+        <button style="background:none; border:2px solid #333; color:#555; width:100px; height:100px; border-radius:50%; font-size:40px; cursor:pointer; transition: 0.3s; margin-top: 30vh;" onclick="navigasi('welcome')">⏻</button>
+        <p class="font-orbitron" style="color: #555; margin-top: 20px; letter-spacing: 3px;">SYSTEM OFFLINE</p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // === 1. FUNGSI NAVIGASI UTAMA (PALING AMAN) ===
+        function navigasi(idTujuan) {
+            document.querySelectorAll('.page-container').forEach(halaman => {
+                halaman.classList.remove('active');
+                halaman.style.display = 'none'; // Sembunyikan total yang tidak aktif
+            });
+            
+            let halamanTujuan = document.getElementById(idTujuan);
+            halamanTujuan.style.display = 'flex'; // Munculkan sebelum dianimasikan
+            
+            // Sedikit jeda agar transisi CSS jalan
+            setTimeout(() => {
+                halamanTujuan.classList.add('active');
+            }, 10);
+            
+            window.scrollTo(0, 0);
+        }
+
+        function bukaBukuPanduan() {
+            try { window.open('panduan.pdf', '_blank'); } 
+            catch(e) { alert("Buku panduan belum ditambahkan ke folder."); }
+        }
+
+        // Jalankan saat pertama buka (paksa Welcome screen muncul)
+        navigasi('welcome');
+
+        // === 2. INISIALISASI GRAFIK & FIREBASE (DIBUNGKUS TRY-CATCH BIAR GAK BLANK) ===
+        window.onload = function() {
+            setTimeout(mulaiSistem, 500); // Beri jeda loading HTML setengah detik
+        };
+
+        function mulaiSistem() {
+            try {
+                // Siapkan Grafik Dulu
+                siapkanGrafik();
+
+                // Coba Konek Firebase
+                if (typeof firebase !== 'undefined') {
+                    if (!firebase.apps.length) {
+                        firebase.initializeApp({
+                            apiKey: "AIzaSyBNFwuY2ikhnI6WxGtqW53qioORWLWKNT8",
+                            databaseURL: "https://smart-dehidrator-default-rtdb.asia-southeast1.firebasedatabase.app"
+                        });
+                    }
+                    const db = firebase.database();
+                    document.getElementById('
